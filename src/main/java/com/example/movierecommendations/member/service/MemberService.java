@@ -38,6 +38,14 @@ public class MemberService {
         return member.getMemberId();
     }
 
+    @Transactional
+    // 사용자 이름으로 memberId 반환
+    public Long getMemberIdByMembername(String membername) {
+        Member member = memberRepository.findByMembername(membername)
+                .orElseThrow(() -> new RuntimeException("해당 사용자를 찾을 수 없습니다."));
+        return member.getMemberId(); // memberId 반환
+    }
+
     private void validateCreateMemberRequest(CreateMemberRequestDTO request) {
         if (request.getMembername() == null || request.getMembername().length() < 4) {
             throw new IllegalArgumentException("아이디는 최소 4자 이상이어야 합니다.");
