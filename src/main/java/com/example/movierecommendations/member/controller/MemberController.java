@@ -1,9 +1,6 @@
 package com.example.movierecommendations.member.controller;
 
-import com.example.movierecommendations.member.dto.CreateMemberRequestDTO;
-import com.example.movierecommendations.member.dto.LoginRequestDTO;
-import com.example.movierecommendations.member.dto.LoginResponseDTO;
-import com.example.movierecommendations.member.dto.SaveResponseDTO;
+import com.example.movierecommendations.member.dto.*;
 import com.example.movierecommendations.member.service.AuthenticationService;
 import com.example.movierecommendations.member.service.MemberService;
 import com.example.movierecommendations.security.JwtTokenProvider;
@@ -65,5 +62,32 @@ public class MemberController {
         SecurityContextHolder.clearContext();
 
         return ResponseEntity.ok("로그아웃이 성공적으로 처리되었습니다.");
+    }
+
+    // 비밀번호 수정
+    @PutMapping("/password/{memberId}")
+    public ResponseEntity<String> updatePassword(
+            @PathVariable Long memberId,
+            @RequestBody PasswordUpdateRequestDTO passwordUpdateRequest) {
+
+        memberService.updatePassword(memberId, passwordUpdateRequest);
+        return ResponseEntity.ok("비밀번호가 성공적으로 수정되었습니다.");
+    }
+
+    // 닉네임 수정
+    @PutMapping("/nickname/{memberId}")
+    public ResponseEntity<String> updateNickname(
+            @PathVariable Long memberId,
+            @RequestBody NicknameUpdateRequestDTO nicknameUpdateRequest) {
+
+        memberService.updateNickname(memberId, nicknameUpdateRequest);
+        return ResponseEntity.ok("닉네임이 성공적으로 수정되었습니다.");
+    }
+
+    // 회원 탈퇴
+    @PutMapping("/withdraw/{memberId}")
+    public ResponseEntity<String> withdrawMember(@PathVariable Long memberId) {
+        memberService.withdrawMember(memberId);
+        return ResponseEntity.ok("회원탈퇴가 성공적으로 처리되었습니다.");
     }
 }
