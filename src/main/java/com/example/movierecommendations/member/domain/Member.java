@@ -1,6 +1,7 @@
 package com.example.movierecommendations.member.domain;
 
 import com.example.movierecommendations.member.vo.MemberStatus;
+import com.example.movierecommendations.member.vo.Role;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
