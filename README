@@ -1,18 +1,20 @@
 ## 폴더 구조 설명
 
-ai-server/                   # AI 추천 알고리즘 (Flask 서버)
-├── app/                      
-│   ├── __init__.py           # Flask 애플리케이션 초기화
-│   ├── models/               # AI 모델 관련 코드
-│   │   ├── recommender.py    # 추천 시스템 모델 파일 (PyTorch 모델 포함)
-│   │   └── preprocessing.py  # 데이터 전처리 코드
-│   ├── routes/               # Flask 라우팅 처리
-│   │   ├── __init__.py       # 라우트 초기화
-│   │   └── recommendation.py # 추천 관련 라우트 처리
-│   ├── services/             # AI 모델을 활용한 서비스 로직
-│   │   └── recommender_service.py # 추천 로직 처리
-│   ├── utils/                # 유틸리티 함수 폴더 
-│   │   └── data_processing.py   # 데이터 전처리와 관련된 유틸리티 함수
-│   └── config.py             # Flask 설정 파일 (디버그 설정 등)
-├── requirements.txt          # Python 의존성
-└── run.py                    # Flask 애플리케이션 실행 파일
+.
+├── ai-server/                 # AI 추천 알고리즘 (Flask 서버)
+│   ├── app/
+│   │   ├── __init__.py        # Flask 애플리케이션 초기화
+│   │   ├── models/            # AI 모델 관련 코드
+│   │   │   └── recommender.py  # 추천 시스템 모델 파일 (PyTorch 모델 포함)
+│   │   │   └── preprocessing.py  # 데이터 전처리 코드
+│   │   ├── routes/            # Flask 라우팅 처리
+│   │   │   ├── __init__.py       # 라우트 초기화
+│   │   │   └── recommendation.py  # 추천 API 라우트 정의
+│   │   ├── services/          # 추천 서비스 처리
+│   │   │   └── recommender_service.py  # 추천 로직 처리
+│   │   └── utils/             # 유틸리티 함수
+│   │       └── data_processing.py  # 데이터 전처리 유틸리티 함수 
+│   ├── requirements.txt       # Python 의존성
+│   └── run.py                 # Flask 애플리케이션 실행 파일
+├── database/                  # MariaDB 관련 파일
+│   └── init.sql               # 데이터베이스 초기화 SQL 파일
