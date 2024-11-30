@@ -51,6 +51,10 @@ public class Member {
     @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<PreferredGenre> preferredGenres = new ArrayList<>();
 
+    @JsonIgnore
+    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<PreferredActor> preferredActor = new ArrayList<>();
+
     public void updateRefreshToken(String refreshToken) {
         this.refreshToken = refreshToken;
     }
