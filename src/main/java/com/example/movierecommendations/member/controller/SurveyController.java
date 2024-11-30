@@ -2,6 +2,7 @@ package com.example.movierecommendations.member.controller;
 
 import com.example.movierecommendations.member.dto.CreateSurveyRequestDTO;
 import com.example.movierecommendations.member.dto.SaveResponseDTO;
+import com.example.movierecommendations.member.dto.SurveyResponseDTO;
 import com.example.movierecommendations.member.service.SurveyService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -21,5 +22,12 @@ public class SurveyController {
         return ResponseEntity.ok(new SaveResponseDTO(
                 surveyId, HttpStatus.OK.value(), "설문조사가 정상적으로 등록되었습니다."
         ));
+    }
+
+    // 설문조사 조회 API
+    @GetMapping("/{memberId}")
+    public ResponseEntity<SurveyResponseDTO> getSurveyByMemberId(@PathVariable Long memberId) {
+        SurveyResponseDTO surveyResponse = surveyService.getSurveyByMemberId(memberId);
+        return ResponseEntity.ok(surveyResponse);
     }
 }

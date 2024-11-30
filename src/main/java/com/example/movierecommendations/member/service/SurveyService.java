@@ -5,6 +5,7 @@ import com.example.movierecommendations.member.domain.PreferredActor;
 import com.example.movierecommendations.member.domain.PreferredGenre;
 import com.example.movierecommendations.member.domain.Survey;
 import com.example.movierecommendations.member.dto.CreateSurveyRequestDTO;
+import com.example.movierecommendations.member.dto.SurveyResponseDTO;
 import com.example.movierecommendations.member.repository.MemberRepository;
 import com.example.movierecommendations.member.repository.PreferredActorRepository;
 import com.example.movierecommendations.member.repository.PreferredGenreRepository;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -65,6 +67,34 @@ public class SurveyService {
         if (request.getPreferredActors() == null || request.getPreferredActors().isEmpty()) {
             throw new IllegalArgumentException("선호배우가 선택되지 않았습니다.");
         }
+    }
+
+    // 설문조사 조회
+    public SurveyResponseDTO getSurveyByMemberId(Long memberId) {
+        // Survey 조회
+        Survey survey = surveyRepository.findByMemberId(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 회원의 설문조사가 존재하지 않습니다."));
+
+        // 선호 장르 조회
+        List<String> preferredGenres = preferredGenreRepository.findByMember_MemberId(memberId)
+                .stream()
+                .map(PreferredGenre::getGenre)
+                .collect(Collectors.toList());
+
+        // 선호 배우 조회
+        List<String> preferredActors = preferredActorRepository.findByMember_MemberId(memberId)
+                .stream()
+                .map(PreferredActor::getActor)
+                .collect(Collectors.toList());
+
+        // SurveyResponseDTO 생성 후 반환
+        return SurveyResponseDTO.builder()
+                .surveyId(survey.getSurveyId())
+                .gender(survey.getGender())
+                .age(survey.getAge())
+                .preferredGenres(preferredGenres)
+                .preferredActors(preferredActors)
+                .build();
     }
 }
 
