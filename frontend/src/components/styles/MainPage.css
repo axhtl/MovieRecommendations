@@ -1,0 +1,85 @@
+/* MainPage.css */
+
+.main-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: #f0f0f0;
+    height: 100vh;
+    padding-top: 20px;
+}
+
+.main-content {
+    width: 80%;
+    max-width: 1200px;
+    background: #fff;
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.no-movies {
+    text-align: center;
+    padding: 40px;
+}
+
+.no-movies h2 {
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.no-movies p {
+    margin-bottom: 20px;
+    color: #555;
+}
+
+.add-movie-button {
+    padding: 10px 20px;
+    background-color: #333;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.add-movie-button:hover {
+    background-color: #555;
+}
+
+.movie-section {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 40px;
+}
+
+.my-movies, .recommended-movies {
+    width: 48%;
+}
+
+.movie-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.movie-item {
+    width: 150px;
+    text-align: center;
+    background: #f9f9f9;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.movie-item img {
+    width: 100%;
+    height: auto;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+.movie-item p {
+    color: #333;
+    font-size: 14px;
+}
