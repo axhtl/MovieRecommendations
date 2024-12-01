@@ -4,9 +4,14 @@ import torch
 from sklearn.metrics.pairwise import cosine_similarity
 import pandas as pd
 import requests
+import os
+from dotenv import load_dotenv
 
-HUGGINGFACE_TOKEN = "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"
-TMDB_API_KEY = "62235f29bab13ddc95e74fdae01ed850"
+# 환경 변수 로드
+load_dotenv()
+
+HUGGINGFACE_TOKEN = os.getenv("HUGGINGFACE_TOKEN")
+TMDB_API_KEY = os.getenv("TMDB_API_KEY")
 
 model_name = "meta-llama/Llama-3.2-3B-Instruct"
 tokenizer = AutoTokenizer.from_pretrained(model_name, use_auth_token=HUGGINGFACE_TOKEN)
