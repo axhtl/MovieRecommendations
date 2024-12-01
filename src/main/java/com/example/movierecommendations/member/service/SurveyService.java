@@ -5,16 +5,18 @@ import com.example.movierecommendations.member.domain.PreferredActor;
 import com.example.movierecommendations.member.domain.PreferredGenre;
 import com.example.movierecommendations.member.domain.Survey;
 import com.example.movierecommendations.member.dto.CreateSurveyRequestDTO;
-import com.example.movierecommendations.member.dto.SurveyResponseDTO;
+import com.example.movierecommendations.member.dto.survey.SurveyResponseDTO;
 import com.example.movierecommendations.member.repository.MemberRepository;
 import com.example.movierecommendations.member.repository.PreferredActorRepository;
 import com.example.movierecommendations.member.repository.PreferredGenreRepository;
 import com.example.movierecommendations.member.repository.SurveyRepository;
+import com.example.movierecommendations.member.vo.Gender;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -70,6 +72,7 @@ public class SurveyService {
     }
 
     // 설문조사 조회
+    @Transactional(readOnly = true)
     public SurveyResponseDTO getSurveyByMemberId(Long memberId) {
         // Survey 조회
         Survey survey = surveyRepository.findByMemberId(memberId)
@@ -95,6 +98,80 @@ public class SurveyService {
                 .preferredGenres(preferredGenres)
                 .preferredActors(preferredActors)
                 .build();
+    }
+
+    // 성별 수정
+    @Transactional
+    public void updateGender(Long memberId, Gender gender) {
+        // Survey 객체를 조회하고 없으면 예외 처리
+        Survey survey = surveyRepository.findByMemberId(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 ID의 설문조사를 찾을 수 없습니다. memberId: " + memberId));
+
+        // Survey 객체의 성별을 업데이트
+        survey.updateGender(gender);
+
+        // 업데이트된 Survey 객체를 저장
+        surveyRepository.save(survey);
+    }
+
+    // 나이 수정
+    @Transactional
+    public void updateAge(Long memberId, String age) {
+        // Survey 객체를 조회하고 없으면 예외 처리
+        Survey survey = surveyRepository.findByMemberId(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 ID의 설문조사를 찾을 수 없습니다. memberId: " + memberId));
+
+        // Survey 객체의 나이를 업데이트
+        survey.updateAge(age);
+
+        // 업데이트된 Survey 객체를 저장
+        surveyRepository.save(survey);
+    }
+
+    // 선호 장르 추가
+    @Transactional
+    public void addPreferredGenre(Long memberId, String genre) {
+        // Optional에서 Member 객체를 가져옴. 없으면 예외 처리.
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 ID의 회원을 찾을 수 없습니다. memberId: " + memberId));
+
+        PreferredGenre preferredGenre = PreferredGenre.builder()
+                .member(member)
+                .genre(genre)
+                .build();
+        preferredGenreRepository.save(preferredGenre);
+    }
+
+    // 선호 장르 삭제
+    @Transactional
+    public void deletePreferredGenre(Long preferredGenreId) {
+        PreferredGenre preferredGenre = preferredGenreRepository.findById(preferredGenreId)
+                .orElseThrow(() -> new RuntimeException("해당 preferredGenreId에 대한 선호 장르가 존재하지 않습니다."));
+
+        preferredGenreRepository.deleteByPreferredGenreId(preferredGenreId);
+    }
+
+    // 선호 배우 추가
+    @Transactional
+    public void addPreferredActor(Long memberId, String actor) {
+        // Optional에서 Member 객체를 가져옴. 없으면 예외 처리.
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 ID의 회원을 찾을 수 없습니다. memberId: " + memberId));
+
+        PreferredActor preferredActor = PreferredActor.builder()
+                .member(member)
+                .actor(actor)
+                .build();
+        preferredActorRepository.save(preferredActor);
+    }
+
+    // 선호 배우 삭제
+    @Transactional
+    public void deletePreferredActor(Long preferredActorId) {
+        PreferredActor preferredActor = preferredActorRepository.findById(preferredActorId)
+                .orElseThrow(() -> new RuntimeException("해당 preferredGenreId에 대한 선호 장르가 존재하지 않습니다."));
+
+        preferredActorRepository.deleteByPreferredActorId(preferredActorId);
     }
 }
 

@@ -1,4 +1,4 @@
-package com.example.movierecommendations.member.dto;
+package com.example.movierecommendations.member.dto.survey;
 
 import com.example.movierecommendations.member.vo.Gender;
 import lombok.AllArgsConstructor;

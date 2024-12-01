@@ -25,4 +25,12 @@ public class Survey {
     private Gender gender;
 
     private String age;
+
+    public void updateGender(Gender gender) {
+        this.gender = gender;
+    }
+
+    public void updateAge(String age) {
+        this.age = age;
+    }
 }
