@@ -28,11 +28,10 @@ const SearchPage = () => {
     }
   }, [location.search]);
 
-  const handleMovieClick = (movieCd) => {
-    console.log('Navigating to movie details with ID:', movieCd); // 로그 추가
-    navigate(`/search-details/${movieCd}`);
+  const handleMovieClick = (movieId) => {
+    console.log('Navigating to movie details with ID:', movieId); // 로그 추가
+    navigate(`/search-details/${movieId}`);
   };
-  
 
   return (
     <div className="search-page">

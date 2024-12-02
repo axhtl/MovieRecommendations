@@ -2,13 +2,19 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import '../styles/Navbar.css'; // 스타일 파일 경로
-import { searchMovies } from '../../api/tmdb'; // API 요청 파일이 분리된 경우, 해당 경로로 추가
+import { FiLogOut, FiSearch } from 'react-icons/fi'; // 로그아웃, 검색 아이콘 추가
 
 function Navbar() {
   const [searchQuery, setSearchQuery] = useState(''); // 검색어 상태 관리
   const navigate = useNavigate(); // 경로 이동을 위한 useNavigate
 
   const tmdbApiToken = "eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI2MjIzNWYyOWJhYjEzZGRjOTVlNzRmZGFlMDFlZDg1MCIsIm5iZiI6MTczMjk2NDExMC4yNzcsInN1YiI6IjY3NGFlZjBlYTEyMzE5ZTVjZTBjZmM3YyIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.A_KVw6zVQ_no9vKL_mi_WtESpSJajqjwcgAtwWSj4Ns"; // TMDB API 토큰
+
+  // 로그아웃 핸들러 함수
+  const handleLogout = () => {
+    localStorage.removeItem('accessToken'); // 예시로 로컬스토리지에서 토큰 삭제
+    navigate('/'); // 로그아웃 후 메인 페이지로 이동
+  };
 
   // 검색 핸들러 함수 추가
   const handleSearch = async () => {
@@ -71,7 +77,12 @@ function Navbar() {
             onChange={(e) => setSearchQuery(e.target.value)} // 검색어 입력 핸들링
             onKeyPress={handleKeyPress} // Enter 키로 검색 실행
           />
-          <button onClick={handleSearch}>🔍</button>
+          <button onClick={handleSearch} className="search-button">
+            <FiSearch size={20} /> {/* 돋보기 아이콘 추가 */}
+          </button>
+          <button className="logout-button" onClick={handleLogout}>
+            <FiLogOut size={20} /> {/* 로그아웃 아이콘 추가 */}
+          </button>
         </div>
       </div>
     </nav>

@@ -12,7 +12,7 @@ const MainPage = () => {
   }, []);
 
   const handleSearchClick = () => {
-    navigate('/movie/search'); // /movie/search 경로로 이동
+    navigate('/movie/view'); // /movie/search 경로로 이동
   };
 
   return (
@@ -24,7 +24,7 @@ const MainPage = () => {
             <h2>아직 사용자를 위한 영화가 없어요 ㅠ</h2>
             <p>바로 등록하러 가볼까요?</p>
             <button className="add-movie-button" onClick={handleSearchClick}>
-              영화 검색하기
+              영화 등록하기
             </button>
           </div>
         ) : (
