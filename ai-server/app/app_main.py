@@ -16,9 +16,24 @@ def ai_recommendation():
     data = request.get_json()
 
     # 요청에서 user_input (사용자 선호 데이터)과 user_behavior_data (사용자 행동 데이터) 받기
-    user_input = data.get('user_input')  # 사용자 선호 정보 (예: {'preferredGenres': ['Action', 'Comedy'], 'preferredActors': ['Actor1']})
-    user_behavior_data = data.get('user_behavior_data')  # 사용자 행동 데이터 (예: [{'liked_movies': ['Movie1', 'Movie2']}, ...])
+    user_input = data.get('user_input')  # 사용자 선호 정보
+    user_behavior_data = data.get('user_behavior_data')  # 사용자 행동 데이터
     movie_name = data.get('movie_name')  # 추가된 부분: 검색된 영화 이름을 받음
+
+    """
+    # 사용자 데이터 및 행동 데이터
+    user_data = {
+        "gender": "M",
+        "age": "30",
+        "preferredGenres": ["코미디"],
+        "preferredActors": ["황정민"]
+    }
+    user_behavior_data = [
+        {"user_id": 1, "liked_movies": ["명량", "베테랑"]},
+        {"user_id": 2, "liked_movies": ["명량"]},
+        {"user_id": 3, "liked_movies": ["베테랑"]},
+    ]
+    """
 
     if not user_input or not user_behavior_data or not movie_name:
         return jsonify({"error": "필수 데이터가 누락되었습니다. user_input, user_behavior_data, movie_name이 필요합니다."}), 400
