@@ -1,72 +1,52 @@
 import React, { useEffect, useState } from 'react';
 import Navbar from '../ui/Navbar';
+import MovieList from '../list/MovieList';
 import '../styles/SearchPage.css';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 const SearchPage = () => {
-  const [searchTerm, setSearchTerm] = useState('');
   const [searchResults, setSearchResults] = useState([]);
-  const navigate = useNavigate();
+  const [searchTerm, setSearchTerm] = useState(''); // 검색어 상태 관리
   const location = useLocation();
+  const navigate = useNavigate();
 
   useEffect(() => {
+    // URL에서 쿼리 파라미터 추출
     const queryParams = new URLSearchParams(location.search);
-    const query = queryParams.get('query');
+    const results = queryParams.get('results');
+    const query = queryParams.get('query'); // 검색어 추출
+
+    try {
+      const parsedResults = results ? JSON.parse(decodeURIComponent(results)) : [];
+      setSearchResults(parsedResults);
+    } catch (error) {
+      console.error('결과 파싱 중 오류:', error);
+    }
+
     if (query) {
-      setSearchTerm(query);
-      handleSearch(query);
+      setSearchTerm(query); // 검색어 저장
     }
   }, [location.search]);
 
-  const handleSearch = (query) => {
-    // 영화 데이터를 서버에서 검색하는 로직을 구현 (현재는 임시 데이터 사용)
-    setSearchResults([
-      { id: 1, name: '영화 이름 1', imageUrl: '/images/movie-placeholder.png' },
-      { id: 2, name: '영화 이름 2', imageUrl: '/images/movie-placeholder.png' },
-      { id: 3, name: '영화 이름 3', imageUrl: '/images/movie-placeholder.png' },
-    ]);
+  const handleMovieClick = (movieCd) => {
+    console.log('Navigating to movie details with ID:', movieCd); // 로그 추가
+    navigate(`/search-details/${movieCd}`);
   };
-
-  const handleMovieClick = (movieId) => {
-    // 영화 클릭 시 영화 등록 페이지로 이동
-    navigate(`/register-movie/${movieId}`);
-  };
+  
 
   return (
     <div className="search-page">
       <Navbar />
       <div className="search-content">
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            handleSearch(searchTerm);
-          }}
-          className="search-form"
-        >
-          <input
-            type="text"
-            placeholder="검색어를 입력하세요"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-          <button type="submit">🔍</button>
-        </form>
-        <div className="search-results">
-          {searchResults.length > 0 && (
-            <div className="movie-list">
-              {searchResults.map((movie) => (
-                <div
-                  key={movie.id}
-                  className="movie-item"
-                  onClick={() => handleMovieClick(movie.id)}
-                >
-                  <img src={movie.imageUrl} alt={movie.name} />
-                  <p>{movie.name}</p>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+        {searchResults.length === 0 && (
+          <p className="no-results-message">검색 결과가 없습니다.</p> // 검색 결과가 없을 때 메시지 표시
+        )}
+        {searchResults.length > 0 && (
+          <div className="movie-category">
+            <h2>'{searchTerm}' 검색 결과</h2>
+            <MovieList movies={searchResults} onMovieClick={handleMovieClick} />
+          </div>
+        )}
       </div>
     </div>
   );

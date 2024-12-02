@@ -11,6 +11,12 @@ const LoginPage = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
 
+    // 유효성 검사: 모든 필드가 입력되었는지 확인
+    if (!username || !password) {
+      alert('모든 필드를 입력해 주세요.');
+      return;
+    }
+
     // 요청 데이터 생성
     const loginData = {
       membername: username,
@@ -26,16 +32,35 @@ const LoginPage = () => {
       });
 
       // 서버 응답 처리
-      if (response.data.success) {
-        alert(response.data.message); // 성공 메시지
-        localStorage.setItem('token', response.data.token); // JWT 토큰 저장 (필요 시)
-        navigate('/main'); // MainPage로 이동
+      console.log('Login Response:', response.data);
+      
+      // 응답 데이터에서 필요한 정보를 추출
+      const { memberId, statusCode, message, accessToken } = response.data;
+
+      if (statusCode === 200 && accessToken) {
+        alert(message);
+        
+        // 토큰과 멤버 ID 저장
+        localStorage.setItem('token', accessToken);
+        localStorage.setItem('memberId', memberId); // 멤버 ID 저장
+        
+        console.log('Login successful. Navigating to main...');
+        
+        // 메인 페이지로 이동
+        navigate('/main', { replace: true });
       } else {
-        alert(response.data.message || 'Invalid username or password.');
+        console.error('Login failed:', message);
+        alert(message || 'Invalid username or password.');
       }
+
     } catch (error) {
-      console.error('Login error:', error.response || error.message);
-      alert('Failed to login. Please try again.');
+      if (error.response) {
+        console.error('Login error:', error.response.data);
+        alert(`서버 오류: ${error.response.data.message || 'Failed to login'}`);
+      } else {
+        console.error('Network or unknown error:', error.message);
+        alert('네트워크 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.');
+      }
     }
   };
 

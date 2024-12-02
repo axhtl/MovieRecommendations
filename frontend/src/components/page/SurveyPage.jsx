@@ -11,8 +11,7 @@ const genresList = [
 const SurveyPage = () => {
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
-  const userId = searchParams.get('userId'); // URL에서 userId 가져오기
-  const nickname = searchParams.get('nickname'); // URL에서 nickname 가져오기
+  const userId = searchParams.get('userId'); // URL에서 userId 가져오기 (여기서 수정)
 
   const navigate = useNavigate();
   const [actors, setActors] = useState('');
@@ -42,11 +41,17 @@ const SurveyPage = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
+    if (!userId) {
+      console.error('User ID is missing from the URL.');
+      alert('회원 정보를 찾을 수 없습니다. 다시 시도해 주세요.');
+      return;
+    }
+
     const surveyData = {
       gender: document.getElementById('gender').value,
       age: document.getElementById('age').value,
       preferredGenres: selectedGenres,
-      preferredActors: actorList
+      preferredActors: actorList,
     };
 
     fetch(`/survey/${userId}`, {
@@ -61,14 +66,18 @@ const SurveyPage = () => {
           navigate('/main'); // 성공 시 메인 페이지로 이동
         } else {
           console.error('Error submitting survey:', response.statusText);
+          alert('설문 제출에 실패했습니다. 다시 시도해 주세요.');
         }
       })
-      .catch((error) => console.error('Error:', error));
+      .catch((error) => {
+        console.error('Error:', error);
+        alert('오류가 발생했습니다. 잠시 후 다시 시도해 주세요.');
+      });
   };
 
   return (
     <div className="survey-page">
-      <h2>{nickname ? `${nickname} 님에 대해 알려주세요!` : '에 대해 알려주세요!'}</h2>
+      <h2>우선! 당신에 대해 알려주세요.</h2>
       <p>아래 설문조사를 작성해 주세요.</p>
       <form className="survey-form" onSubmit={handleSubmit}>
         <div className="form-group">

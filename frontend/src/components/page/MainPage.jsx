@@ -1,13 +1,19 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom'; // useNavigate 추가
 import Navbar from '../ui/Navbar';
 import '../styles/MainPage.css';
 
 const MainPage = () => {
   const [movies, setMovies] = useState([]);
+  const navigate = useNavigate(); // navigate 사용 준비
 
   useEffect(() => {
-    setMovies([]);
+    setMovies([]); // 초기값 설정
   }, []);
+
+  const handleSearchClick = () => {
+    navigate('/movie/search'); // /movie/search 경로로 이동
+  };
 
   return (
     <div className="main-page">
@@ -17,7 +23,9 @@ const MainPage = () => {
           <div className="no-movies">
             <h2>아직 사용자를 위한 영화가 없어요 ㅠ</h2>
             <p>바로 등록하러 가볼까요?</p>
-            <button className="add-movie-button">영화 검색하기</button>
+            <button className="add-movie-button" onClick={handleSearchClick}>
+              영화 검색하기
+            </button>
           </div>
         ) : (
           <div className="movie-section">

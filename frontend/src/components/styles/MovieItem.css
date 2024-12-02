@@ -1,0 +1,31 @@
+/* MovieItem.css */
+
+.movie-item {
+    flex: 0 0 auto; /* Flexbox 내에서 항목이 줄어들지 않도록 설정 */
+    width: 180px;
+    text-align: center;
+    background: #f9f9f9;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s, box-shadow 0.3s;
+    cursor: pointer;
+}
+
+.movie-item:hover {
+    transform: scale(1.2); /* 마우스 올렸을 때 확대 */
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3); /* 마우스 올렸을 때 그림자 강화 */
+    z-index: 1; /* 확대될 때 다른 요소 위로 올라오도록 설정 */
+}
+
+.movie-item img {
+    width: 100%;
+    height: auto;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+.movie-item p {
+    color: #333;
+    font-size: 16px;
+}

@@ -12,9 +12,15 @@ const RegisterPage = () => {
     const handleRegister = async (e) => {
         e.preventDefault();
 
+        // 유효성 검사: 모든 필드가 입력되었는지 확인
+        if (!nickname || !membername || !password || !confirmPassword) {
+            alert('모든 필드를 입력해 주세요.');
+            return;
+        }
+
         // 비밀번호 확인
         if (password !== confirmPassword) {
-            alert('Passwords do not match!');
+            alert('비밀번호가 일치하지 않습니다.');
             return;
         }
 
@@ -37,22 +43,28 @@ const RegisterPage = () => {
 
             if (response.ok) {
                 const result = await response.json(); // 서버 응답
-                const userId = result.userId; // 백엔드 응답에서 userId 추출
-                const registeredNickname = result.nickname; // 백엔드에서 받은 nickname
+                console.log('회원가입 성공:', result); // 응답 확인
+                const memberId = result.id; // 백엔드 응답에서 memberId 추출
+
+                if (!memberId) {
+                    console.error("Member ID is missing in the response.");
+                    alert("회원가입이 완료되었지만 회원 정보를 불러오는데 실패했습니다. 다시 시도해 주세요.");
+                    return;
+                }
 
                 // 성공 메시지와 페이지 이동
-                alert('Registration successful!');
-                navigate(`/survey?userId=${userId}&nickname=${encodeURIComponent(registeredNickname)}`);
+                alert('회원가입이 성공적으로 완료되었습니다!');
+                navigate(`/survey?userId=${memberId}`);
             } else {
                 // 실패 시 처리
-                const errorMessage = await response.text();
-                console.error('Failed to register:', errorMessage);
-                alert('Failed to register. Please try again.');
+                const errorResult = await response.json();
+                console.error('회원가입 실패:', errorResult.message || 'Unknown error');
+                alert(`회원가입에 실패했습니다. 오류: ${errorResult.message || '다시 시도해 주세요.'}`);
             }
         } catch (error) {
             // 네트워크 또는 서버 오류 처리
-            console.error('Error:', error);
-            alert('Error occurred. Please try again later.');
+            console.error('서버와의 연결에 문제가 발생했습니다:', error);
+            alert('오류가 발생했습니다. 잠시 후 다시 시도해 주세요.');
         }
     };
 
@@ -68,7 +80,7 @@ const RegisterPage = () => {
                 />
                 <input
                     type="email"
-                    placeholder="아이디"
+                    placeholder="아이디 (이메일)"
                     value={membername}
                     onChange={(e) => setMembername(e.target.value)}
                 />

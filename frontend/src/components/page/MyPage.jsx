@@ -1,46 +1,85 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import Navbar from '../ui/Navbar';
-import '../styles/MyPage.css';
+import '../styles/SearchPage.css';
+import { useNavigate, useLocation } from 'react-router-dom';
+import axios from 'axios';
 
-const MyPage = () => {
-  // eslint-disable-next-line no-unused-vars
-  const [userInfo, setUserInfo] = useState(null);
-  const [myMovies, setMyMovies] = useState([]);
+const SearchPage = () => {
+  const [searchTerm, setSearchTerm] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
+  const [itemPerPage, setItemPerPage] = useState(10); // itemPerPage 상태 추가
+  const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
-    // 유저 정보 및 내가 등록한 영화 데이터를 서버에서 가져오는 부분 (임시로 빈 배열로 초기화)
-    setMyMovies([
-      { id: 1, name: '영화 이름 1', imageUrl: '/images/movie-placeholder.png' },
-      { id: 2, name: '영화 이름 2', imageUrl: '/images/movie-placeholder.png' },
-      { id: 3, name: '영화 이름 3', imageUrl: '/images/movie-placeholder.png' },
-      { id: 4, name: '영화 이름 4', imageUrl: '/images/movie-placeholder.png' },
-    ]);
-  }, []);
+    // URL에서 쿼리 파라미터 추출
+    const queryParams = new URLSearchParams(location.search);
+    const query = queryParams.get('movieName');
+    if (query) {
+      setSearchTerm(query);
+      handleSearch(query, itemPerPage); // itemPerPage 전달
+    } else {
+      setSearchResults([]); // 검색어가 없을 경우 검색 결과 초기화
+    }
+  }, [location.search, itemPerPage]);
+
+  const handleSearch = async (query, itemsPerPage) => {
+    try {
+      // 서버로 검색 요청 보내기
+      const response = await axios.get('http://localhost:8080/search-movies', {
+        params: { movieName: query, itemPerPage: itemsPerPage }, // itemPerPage 전달
+      });
+      // 검색 결과 업데이트
+      setSearchResults(response.data);
+    } catch (error) {
+      console.error('검색 오류:', error);
+      setSearchResults([]); // 검색 실패 시 결과 초기화
+    }
+  };
+
+  const handleMovieClick = (movieId) => {
+    // 영화 클릭 시 영화 등록 페이지로 이동
+    navigate(`/registermovie/${movieId}`);
+  };
 
   return (
-    <div className="my-page">
+    <div className="search-page">
       <Navbar />
-      <div className="my-page-content">
-        <div className="user-info">
-          <h2>내 정보가 담긴 내용</h2>
-          <p>이름: {userInfo.name}</p>
-          <p>이메일: {userInfo.email}</p>
-          <button className="edit-button">수정</button>
+      <div className="search-content">
+        <div className="search-options">
+          {/* itemPerPage 선택 기능 추가 */}
+          <label>
+            페이지당 아이템 수:
+            <select
+              value={itemPerPage}
+              onChange={(e) => setItemPerPage(Number(e.target.value))}
+            >
+              <option value={5}>5</option>
+              <option value={10}>10</option>
+              <option value={15}>15</option>
+              <option value={20}>20</option>
+            </select>
+          </label>
         </div>
-        <div className="my-movies">
-          <h2>내가 등록한 영화</h2>
+        {searchResults.length === 0 ? (
+          <p>검색 결과가 없습니다.</p> // 검색 결과가 없을 때 메시지 표시
+        ) : (
           <div className="movie-list">
-            {myMovies.map((movie) => (
-              <div key={movie.id} className="movie-item">
+            {searchResults.map((movie) => (
+              <div
+                key={movie.id}
+                className="movie-item"
+                onClick={() => handleMovieClick(movie.id)}
+              >
                 <img src={movie.imageUrl} alt={movie.name} />
                 <p>{movie.name}</p>
               </div>
             ))}
           </div>
-        </div>
+        )}
       </div>
     </div>
   );
 };
 
-export default MyPage;
+export default SearchPage;
