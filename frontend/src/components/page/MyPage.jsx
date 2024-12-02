@@ -3,7 +3,8 @@ import Navbar from '../ui/Navbar';
 import '../styles/MyPage.css';
 
 const MyPage = () => {
-  const [userInfo, setUserInfo] = useState({ name: '닉네임', email: 'example@example.com' });
+  // eslint-disable-next-line no-unused-vars
+  const [userInfo, setUserInfo] = useState(null);
   const [myMovies, setMyMovies] = useState([]);
 
   useEffect(() => {

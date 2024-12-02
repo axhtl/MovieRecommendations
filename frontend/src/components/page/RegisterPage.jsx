@@ -11,11 +11,14 @@ const RegisterPage = () => {
 
     const handleRegister = async (e) => {
         e.preventDefault();
+
+        // 비밀번호 확인
         if (password !== confirmPassword) {
             alert('Passwords do not match!');
             return;
         }
 
+        // 회원가입 데이터
         const data = {
             membername: membername,
             password: password,
@@ -23,7 +26,8 @@ const RegisterPage = () => {
         };
 
         try {
-            const response = await fetch('http://localhost:8080/member/signup', {
+            // 회원가입 요청
+            const response = await fetch('/member/signup', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -32,12 +36,21 @@ const RegisterPage = () => {
             });
 
             if (response.ok) {
+                const result = await response.json(); // 서버 응답
+                const userId = result.userId; // 백엔드 응답에서 userId 추출
+                const registeredNickname = result.nickname; // 백엔드에서 받은 nickname
+
+                // 성공 메시지와 페이지 이동
                 alert('Registration successful!');
-                navigate('/survey'); // 회원가입 후 설문조사 페이지로 이동
+                navigate(`/survey?userId=${userId}&nickname=${encodeURIComponent(registeredNickname)}`);
             } else {
+                // 실패 시 처리
+                const errorMessage = await response.text();
+                console.error('Failed to register:', errorMessage);
                 alert('Failed to register. Please try again.');
             }
         } catch (error) {
+            // 네트워크 또는 서버 오류 처리
             console.error('Error:', error);
             alert('Error occurred. Please try again later.');
         }

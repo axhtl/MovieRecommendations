@@ -23,14 +23,14 @@ const StartPage = () => {
     return (
         <div className="start-page">
             <div className="header">
-                <button className="signup-button" onClick={() => navigate('/register')}>회원가입</button>
+                <button className="signup-button" onClick={() => navigate('/member/signup')}>회원가입</button>
             </div>
             <div className="content" style={{ height: '100vh' }}>
                 <div className="logo">
                     <img src="/icons/group-icon.png" alt="Logo" />
                 </div>
-                <h1>영화 추천 사이트</h1>
-                <button className="login-button" onClick={() => navigate('/login')}>로그인</button>
+                <h1>MOVIE PICK</h1>
+                <button className="login-button" onClick={() => navigate('/member/login')}>로그인</button>
             </div>
             <div className="explanation" style={{ padding: '50px', backgroundColor: '#f9f9f9' }}>
                 <h2>AI 추천 알고리즘 방식 대한 설명</h2>

@@ -19,7 +19,7 @@ const LoginPage = () => {
 
     try {
       // 로그인 API 호출
-      const response = await axios.post('http://localhost:8080/member/login', loginData, {
+      const response = await axios.post('/member/login', loginData, {
         headers: {
           'Content-Type': 'application/json',
         },
