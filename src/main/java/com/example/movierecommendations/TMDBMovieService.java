@@ -3,14 +3,16 @@ package com.example.movierecommendations;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Service
 public class TMDBMovieService {
 
     private final String API_URL = "https://api.themoviedb.org/3/search/movie";
-//    private final String API_KEY = "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI2MjIzNWYyOWJhYjEzZGRjOTVlNzRmZGFlMDFlZDg1MCIsIm5iZiI6MTczMjk2NDExMC4yNzcsInN1YiI6IjY3NGFlZjBlYTEyMzE5ZTVjZTBjZmM3YyIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.A_KVw6zVQ_no9vKL_mi_WtESpSJajqjwcgAtwWSj4Ns";
-    private final String API_KEY = "eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI2MjIzNWYyOWJhYjEzZGRjOTVlNzRmZGFlMDFlZDg1MCIsIm5iZiI6MTczMjk2NDExMC4yNzcsInN1YiI6IjY3NGFlZjBlYTEyMzE5ZTVjZTBjZmM3YyIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.A_KVw6zVQ_no9vKL_mi_WtESpSJajqjwcgAtwWSj4Ns";
+
+    @Value("${tmdb.apikey}")
+    private String API_KEY;
 
     public String searchMovies(String query, boolean includeAdult, String language, int page) {
         OkHttpClient client = new OkHttpClient();
