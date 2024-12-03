@@ -47,6 +47,9 @@ dependencies {
 	// Jackson XML
 	implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml'
 	implementation 'org.apache.httpcomponents:httpclient:4.5.13'
+
+	// OkHttpClient
+	implementation 'com.squareup.okhttp3:okhttp:4.10.0'
 }
 
 tasks.named('test') {

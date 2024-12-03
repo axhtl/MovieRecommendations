@@ -18,4 +18,5 @@ public class SurveyResponseDTO {
     private String age; // 나이
     private List<String> preferredGenres; // 선호 장르
     private List<String> preferredActors; // 선호 배우
+
 }

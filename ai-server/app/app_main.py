@@ -3,8 +3,11 @@ import pandas as pd
 from .model import Hybrid_Recom_Module
 #from Hybrid_Recom_Module import do_recommendation, tmdb_prepare, embeddingsNsimilarityCal
 import json
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)  # 모든 도메인에서 접근 허용
+
 
 # 영화 데이터 준비 (예시로 5페이지의 영화 데이터를 불러옴)
 df_movies = tmdb_prepare(n_pages=5)

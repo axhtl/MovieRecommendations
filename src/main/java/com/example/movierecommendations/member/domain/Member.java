@@ -74,4 +74,6 @@ public class Member {
     public void updateDeletedAt(LocalDateTime deletedAt) {
         this.deletedAt = deletedAt;
     }
+
+
 }

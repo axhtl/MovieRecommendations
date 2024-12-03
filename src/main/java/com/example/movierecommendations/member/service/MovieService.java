@@ -1,149 +1,148 @@
 package com.example.movierecommendations.member.service;
 
-import com.example.movierecommendations.member.dto.SaveResponseDTO;
 import com.example.movierecommendations.member.dto.survey.SurveyResponseDTO;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.*;
+import com.example.movierecommendations.member.dto.RecommendationDTO;
+import com.example.movierecommendations.member.domain.Recommendation;
+import com.example.movierecommendations.member.domain.Member;
+import com.example.movierecommendations.member.repository.RecommendationRepository;
+import com.example.movierecommendations.member.repository.MemberRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.http.*;
 import org.springframework.web.util.UriComponentsBuilder;
+
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.Optional;
 
 @Service
-@RequiredArgsConstructor
 public class MovieService {
 
-    @Value("${movie.apikey}")
-    private String API_KEY; // 영화 API 키를 외부 설정 파일에서 불러오기
+    private final RestTemplate restTemplate;
+    private final RecommendationRepository recommendationRepository;
+    private final MemberRepository memberRepository;
 
-    private static final String MOVIE_LIST_URL = "http://www.kobis.or.kr/kobisopenapi/webservice/rest/movie/searchMovieList.json"; // 영화 목록 검색 API URL
-    private static final String MOVIE_DETAIL_URL = "http://www.kobis.or.kr/kobisopenapi/webservice/rest/movie/searchMovieInfo"; // 영화 상세정보 조회 API URL
-
-    private final RestTemplate restTemplate = new RestTemplate(); // REST API 호출을 위한 RestTemplate 객체 생성
+    @Autowired
+    public MovieService(RestTemplate restTemplate, RecommendationRepository recommendationRepository,
+                        MemberRepository memberRepository) {
+        this.restTemplate = restTemplate;
+        this.recommendationRepository = recommendationRepository;
+        this.memberRepository = memberRepository;
+    }
 
     /**
-     * Flask 서버로 설문 데이터를 전달하고, 추천 결과를 받는 메소드
-     * @param surveyData 설문조사 결과를 담고 있는 객체
-     * @param movieName 검색된 영화 이름
-     * @return 추천 결과
+     * Flask 서버에서 추천 영화 목록을 가져오는 메소드
      */
-    public String getRecommendationFromFlask(SurveyResponseDTO surveyData, String movieName) {
-        String flaskUrl = "http://localhost:5000/api/ai-recommendation"; // Flask 서버 URL
+    public String getRecommendationFromFlask(SurveyResponseDTO userData, List<String> userBehaviorData, String movieName) {
+        String flaskUrl = "http://localhost:5000/api/ai-recommendation";  // Flask 서버 URL
 
-        // URI에 movieName을 쿼리 파라미터로 추가
+        // HTTP 요청 본문을 설정 (기존 방식 그대로 사용)
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        // 요청 본문을 객체로 전달하는 부분
+        FlaskRequestBody requestBody = new FlaskRequestBody(userData.getGender().toString(), userData.getAge(),
+                userData.getPreferredGenres(), userData.getPreferredActors(), userBehaviorData, movieName);
+
+        HttpEntity<FlaskRequestBody> entity = new HttpEntity<>(requestBody, headers);
+
+        // Flask 서버로 데이터 전송
         URI uri = UriComponentsBuilder.fromHttpUrl(flaskUrl)
-                .queryParam("movieName", movieName) // 영화 이름을 쿼리 파라미터로 추가
-                .encode(StandardCharsets.UTF_8) // 인코딩 명시
+                .encode(StandardCharsets.UTF_8)
                 .build()
                 .toUri();
 
-        // HTTP 요청 헤더 및 본문 설정 (설문 데이터는 JSON 바디로 전송)
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<SurveyResponseDTO> entity = new HttpEntity<>(surveyData, headers); // 설문 데이터를 본문에 포함
-
-        // POST 요청을 보내고 응답을 받음
+        // Flask 서버 응답 처리
         ResponseEntity<String> responseEntity = restTemplate.exchange(uri, HttpMethod.POST, entity, String.class);
-        return responseEntity.getBody(); // 추천 결과 반환
+        return responseEntity.getBody();  // Flask 서버에서 반환한 추천 결과 반환
     }
 
     /**
-     * 영화 이름으로 영화를 검색하고 결과를 반환하는 메소드
-     * @param movieName 검색할 영화 이름
-     * @param itemPerPage 한 번에 가져올 항목 수
-     * @return 영화 목록을 JSON 형태로 반환
+     * TMDB API에서 영화 정보를 가져오는 메소드
      */
-    public String searchMoviesByName(String movieName, int itemPerPage) {
-        try {
-            // URI 생성 및 UTF-8 인코딩 (UriComponentsBuilder 자동 인코딩 사용)
-            URI uri = UriComponentsBuilder.fromHttpUrl(MOVIE_LIST_URL)
-                    .queryParam("key", API_KEY) // API 키
-                    .queryParam("movieNm", movieName) // 검색할 영화 이름
-                    .queryParam("itemPerPage", itemPerPage) // 한 번에 가져올 영화 목록 수
-                    .encode(StandardCharsets.UTF_8) // 인코딩 명시
-                    .build()
-                    .toUri();
+    public String searchMovies(String query, boolean includeAdult, String language, int page) {
+        String API_URL = "https://api.themoviedb.org/3/search/movie";
+        String API_KEY = "YOUR_TMDB_API_KEY";  // TMDB API 키
 
-            System.out.println("Request URL: " + uri); // 디버깅을 위한 요청 URL 출력
+        OkHttpClient client = new OkHttpClient();
+        String url = String.format("%s?query=%s&include_adult=%s&language=%s&page=%d",
+                API_URL, query, includeAdult, language, page);
 
-            // HTTP 요청 헤더 설정
-            HttpHeaders headers = new HttpHeaders();
-            headers.set("Content-Type", "application/json; charset=UTF-8");
-            HttpEntity<String> entity = new HttpEntity<>(headers); // 헤더 설정만 포함한 HTTP 엔티티 생성
+        Request request = new Request.Builder()
+                .url(url)
+                .get()
+                .addHeader("accept", "application/json")
+                .addHeader("Authorization", "Bearer " + API_KEY)
+                .build();
 
-            // API 호출
-            ResponseEntity<String> responseEntity = restTemplate.exchange(uri, HttpMethod.GET, entity, String.class);
-            String response = responseEntity.getBody(); // API 응답 내용
-
-            // JSON 포맷팅 후 반환
-            return prettyPrintJson(response);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            return "API 요청 중 오류 발생"; // 오류 발생 시 메시지 반환
-        }
-    }
-
-    /**
-     * 영화 상세 정보를 조회하는 메소드
-     * @param movieCd 영화 코드
-     * @param responseType 응답 형식 (json 또는 xml)
-     * @return 영화 상세 정보 (JSON 또는 XML)
-     */
-    public String searchMovieDetails(String movieCd, String responseType) {
-        try {
-            // URI 생성 (응답 형식에 따라 .xml 또는 .json으로 구분)
-            URI uri = UriComponentsBuilder.fromHttpUrl(MOVIE_DETAIL_URL + "." + responseType)
-                    .queryParam("key", API_KEY) // API 키
-                    .queryParam("movieCd", movieCd) // 영화 코드
-                    .encode(StandardCharsets.UTF_8) // 인코딩 명시
-                    .build()
-                    .toUri();
-
-            System.out.println("Request URL: " + uri); // 디버깅을 위한 요청 URL 출력
-
-            // HTTP 요청 헤더 설정
-            HttpHeaders headers = new HttpHeaders();
-            headers.set("Content-Type", "application/" + responseType + "; charset=UTF-8"); // 응답 형식에 따라 Content-Type 설정
-            HttpEntity<String> entity = new HttpEntity<>(headers); // 헤더 설정만 포함한 HTTP 엔티티 생성
-
-            // API 호출
-            ResponseEntity<String> responseEntity = restTemplate.exchange(uri, HttpMethod.GET, entity, String.class);
-            String response = responseEntity.getBody(); // API 응답 내용
-
-            // 응답 형식에 맞게 JSON 포맷팅 또는 그대로 반환 (XML은 포맷팅하지 않음)
-            if ("json".equalsIgnoreCase(responseType)) {
-                return prettyPrintJson(response); // JSON 형식은 보기 좋게 포맷팅
+        try (Response response = client.newCall(request).execute()) {
+            if (response.isSuccessful() && response.body() != null) {
+                return response.body().string();  // TMDB API 응답
             } else {
-                return response; // XML 형식은 그대로 반환
+                throw new RuntimeException("Failed to fetch movie data: " + response.message());
             }
-
         } catch (Exception e) {
-            e.printStackTrace();
-            return "API 요청 중 오류 발생"; // 오류 발생 시 메시지 반환
+            throw new RuntimeException("An error occurred while calling the TMDb API", e);
         }
     }
 
     /**
-     * JSON 문자열을 보기 좋게 포맷팅하는 메소드
-     * @param json 포맷팅할 JSON 문자열
-     * @return 포맷팅된 JSON 문자열
+     * 추천 결과 저장 및 반환
      */
-    private String prettyPrintJson(String json) {
-        try {
-            ObjectMapper mapper = new ObjectMapper(); // Jackson의 ObjectMapper를 사용
-            Object jsonObject = mapper.readValue(json, Object.class); // JSON 문자열을 객체로 변환
-            mapper.enable(SerializationFeature.INDENT_OUTPUT); // JSON 가독성을 위한 들여쓰기 활성화
-            return mapper.writeValueAsString(jsonObject); // 객체를 다시 JSON 문자열로 변환
+    public RecommendationDTO saveRecommendation(Long memberId, SurveyResponseDTO userData, List<String> userBehaviorData, String movieName) {
+        // 회원 정보 조회
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new RuntimeException("회원 정보를 찾을 수 없습니다."));
 
-        } catch (Exception e) {
-            e.printStackTrace();
-            return json; // 포맷팅에 실패하면 원본 JSON을 그대로 반환
+        // userBehaviorData는 RecommendationRepository에서 가져오기
+        Optional<Recommendation> existingRecommendation = recommendationRepository.findByMemberId(memberId);
+        List<String> movieRecommendations = null;
+
+        if (existingRecommendation.isPresent()) {
+            movieRecommendations = existingRecommendation.get().getMovieRecommendations();
+        }
+
+        // Flask 서버로부터 추천 영화 목록 받기
+        String recommendation = getRecommendationFromFlask(userData, userBehaviorData, movieName);
+
+        // TMDB에서 영화 정보 검색
+        String movieRecommendationsInfo = searchMovies(recommendation, false, "ko", 1);
+
+        // 추천 결과 저장
+        Recommendation recommendationEntity = new Recommendation();
+        recommendationEntity.setMember(member);
+        recommendationEntity.setMovieRecommendations(List.of(movieRecommendationsInfo));
+
+        // DB에 추천 결과 저장
+        recommendationRepository.save(recommendationEntity);
+
+        // RecommendationDTO로 반환
+        return new RecommendationDTO(memberId, List.of(movieRecommendationsInfo));
+    }
+
+    // Flask 서버로 보낼 요청 본문
+    private static class FlaskRequestBody {
+        public final String gender;
+        public final String age;
+        public final List<String> preferredGenres;
+        public final List<String> preferredActors;
+        public final List<String> userBehaviorData;
+        public final String movieName;
+
+        public FlaskRequestBody(String gender, String age, List<String> preferredGenres, List<String> preferredActors,
+                                List<String> userBehaviorData, String movieName) {
+            this.gender = gender;
+            this.age = age;
+            this.preferredGenres = preferredGenres;
+            this.preferredActors = preferredActors;
+            this.userBehaviorData = userBehaviorData;
+            this.movieName = movieName;
         }
     }
 }
