@@ -26,7 +26,7 @@ public class SurveyController {
         ));
     }
 
-    // 설문조사 조회 API
+    // 회원정보, 설문조사정보 조회 API
     @GetMapping("/{memberId}")
     public ResponseEntity<SurveyResponseDTO> getSurveyByMemberId(@PathVariable Long memberId) {
         SurveyResponseDTO surveyResponse = surveyService.getSurveyByMemberId(memberId);

@@ -78,6 +78,10 @@ public class SurveyService {
         Survey survey = surveyRepository.findByMemberId(memberId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 회원의 설문조사가 존재하지 않습니다."));
 
+        // Member 조회
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 회원이 존재하지 않습니다."));
+
         // 선호 장르 조회
         List<String> preferredGenres = preferredGenreRepository.findByMember_MemberId(memberId)
                 .stream()
@@ -97,6 +101,9 @@ public class SurveyService {
                 .age(survey.getAge())
                 .preferredGenres(preferredGenres)
                 .preferredActors(preferredActors)
+                .memberId(member.getMemberId()) // 회원 ID
+                .membername(member.getMembername()) // 회원 이름
+                .nickname(member.getNickname()) // 닉네임
                 .build();
     }
 
