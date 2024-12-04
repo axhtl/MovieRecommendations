@@ -4,7 +4,7 @@ import com.example.movierecommendations.member.domain.Member;
 import com.example.movierecommendations.member.domain.PreferredActor;
 import com.example.movierecommendations.member.domain.PreferredGenre;
 import com.example.movierecommendations.member.domain.Survey;
-import com.example.movierecommendations.member.dto.CreateSurveyRequestDTO;
+import com.example.movierecommendations.member.dto.survey.CreateSurveyRequestDTO;
 import com.example.movierecommendations.member.dto.survey.SurveyResponseDTO;
 import com.example.movierecommendations.member.repository.MemberRepository;
 import com.example.movierecommendations.member.repository.PreferredActorRepository;
@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service

@@ -20,12 +20,12 @@ public class Review {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long reviewId;
 
-    private String movieCd;
+    private int movieId;
 
-    @Column(length = 1000)
-    private String content;
+//    @Column(length = 1000)
+//    private String content;
 
-    private String rank;
+    private String ranked;
 
     @CreatedDate
     private LocalDateTime createdAt;
