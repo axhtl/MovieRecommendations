@@ -24,13 +24,13 @@ public class SurveyController {
                 surveyId, HttpStatus.OK.value(), "설문조사가 정상적으로 등록되었습니다."
         ));
     }
-
-    // 회원정보, 설문조사정보 조회 API
-    @GetMapping("/{memberId}")
-    public ResponseEntity<SurveyResponseDTO> getSurveyByMemberId(@PathVariable Long memberId) {
-        SurveyResponseDTO surveyResponse = surveyService.getSurveyByMemberId(memberId);
-        return ResponseEntity.ok(surveyResponse);
-    }
+//
+//    // 회원정보, 설문조사정보 조회 API
+//    @GetMapping("/{memberId}")
+//    public ResponseEntity<SurveyResponseDTO> getSurveyByMemberId(@PathVariable Long memberId) {
+//        SurveyResponseDTO surveyResponse = surveyService.getSurveyByMemberId(memberId);
+//        return ResponseEntity.ok(surveyResponse);
+//    }
 
     // 성별 수정
     @PatchMapping("/{memberId}/gender")
