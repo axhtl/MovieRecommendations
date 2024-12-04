@@ -15,4 +15,7 @@ public interface MovieInfoRepository extends JpaRepository<MovieInfo, Long> {
     @Transactional
     @Query("DELETE FROM movie_info m WHERE m.reviewId = :reviewId")
     void deleteByReviewId(@Param("reviewId") Long reviewId);
+
+    // 리뷰 ID로 MovieInfo 조회
+    MovieInfo findByReviewId(Long reviewId);
 }

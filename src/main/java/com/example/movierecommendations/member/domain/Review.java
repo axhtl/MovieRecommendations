@@ -31,7 +31,7 @@ public class Review {
     private LocalDateTime createdAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "memberId")
+    @JoinColumn(name = "member_id")
     @JsonIgnore
     private Member member;
 }

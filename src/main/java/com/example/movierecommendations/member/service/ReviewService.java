@@ -48,12 +48,6 @@ public class ReviewService {
 
     private void saveMovieInfo(int movieId, Long reviewId) {
         try {
-            // 이미 저장된 영화인지 확인
-            if (movieInfoRepository.existsByMovieId(movieId)) {
-                logger.info("Movie with ID {} already exists. Skipping save.", movieId);
-                return;
-            }
-
             // TMDB API 호출
             String movieInfoResponse = tmdbMovieService.getMovieDetails(movieId, "ko");
             JsonNode jsonNode = objectMapper.readTree(movieInfoResponse);
