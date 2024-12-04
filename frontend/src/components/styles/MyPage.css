@@ -3,47 +3,94 @@
   flex-direction: column;
   align-items: center;
   background-color: #f0f0f0;
-  height: 100vh;
-  padding-top: 60px;
+  padding: 20px;
+  min-height: 100vh;
 }
 
-.my-page-content {
-  width: 80%;
-  max-width: 1200px;
-  background: #fff;
-  padding: 40px;
-  border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  margin-top: 20px;
-}
-
-.user-info {
+.content-wrapper {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  margin-bottom: 40px;
+  width: 100%;
+  max-width: 1200px;
 }
 
-.user-info h2 {
+.member-info-section {
+  flex: 1;
+  padding: 20px;
+  border-radius: 10px;
+  margin-right: 20px;
+}
+
+.member-info-section h2 {
   margin-bottom: 10px;
   color: #333;
 }
 
-.user-info p {
-  margin: 5px 0;
-  color: #555;
+.registered-movies-section {
+  flex: 2;
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  margin-left: 20px;
 }
 
-.edit-button {
-  padding: 10px 20px;
-  background-color: #333;
-  color: #fff;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.3s;
+.registered-movies-list {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr); /* 1행에 4개 */
+  gap: 20px;
 }
 
-.edit-button:hover {
-  background-color: #555;
+.registered-movie-card {
+  text-align: center;
+  background-color: #f9f9f9;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 10px;
+}
+
+.registered-movie-card img {
+  width: 100%;
+  border-radius: 10px;
+}
+
+.registered-movie-card p {
+  margin-top: 10px;
+  font-size: 14px;
+  color: #333;
+}
+
+.upcoming-movies-section {
+  width: 100%;
+  max-width: 1200px;
+  margin-top: 20px;
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.upcoming-movies-list {
+  display: flex;
+  gap: 20px;
+}
+
+.movie-card {
+  width: 150px;
+  text-align: center;
+  background-color: #f9f9f9;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 10px;
+}
+
+.movie-card img {
+  width: 100%;
+  border-radius: 10px;
+}
+
+.movie-card p {
+  margin-top: 10px;
+  font-size: 14px;
+  color: #333;
 }

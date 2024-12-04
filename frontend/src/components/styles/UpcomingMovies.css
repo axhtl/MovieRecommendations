@@ -1,0 +1,49 @@
+.upcoming-movies {
+  margin-top: 20px;
+}
+
+.upcoming-movies h2 {
+  margin-bottom: 20px;
+  font-size: 20px;
+  color: #333;
+  text-align: center; /* 제목 중앙 정렬 */
+}
+
+.movie-list {
+  display: grid; /* CSS Grid 사용 */
+  grid-template-columns: repeat(3, 1fr); /* 한 행에 2개 */
+  gap: 20px; /* 카드 간 간격 */
+  justify-content: center; /* 수평 중앙 정렬 */
+}
+
+.movie-card {
+  text-align: center;
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 10px;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.movie-card:hover {
+  transform: scale(1.05); /* 호버 시 확대 효과 */
+}
+
+.movie-poster {
+  width: 100%;
+  border-radius: 10px;
+}
+
+.movie-title {
+  font-size: 14px;
+  font-weight: bold;
+  color: #333;
+  margin-top: 10px;
+}
+
+.movie-release-date {
+  font-size: 12px;
+  color: #666;
+  margin-top: 5px;
+}
