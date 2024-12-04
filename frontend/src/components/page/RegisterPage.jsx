@@ -54,8 +54,7 @@ const RegisterPage = () => {
 
                 // 성공 메시지와 페이지 이동
                 alert('회원가입이 성공적으로 완료되었습니다!');
-                navigate(`/survey?userId=${memberId}`);
-            } else {
+                navigate(`/survey?userId=${memberId}&membername=${membername}&password=${password}`);            } else {
                 // 실패 시 처리
                 const errorResult = await response.json();
                 console.error('회원가입 실패:', errorResult.message || 'Unknown error');

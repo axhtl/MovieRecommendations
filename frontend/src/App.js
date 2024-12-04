@@ -11,6 +11,7 @@ import SearchPage from './components/page/SearchPage';
 import RecommendPage from './components/page/RecommendPage';
 import MovieDetails from './components/list/MovieDetails';
 import ViewPage from './components/page/ViewPage';
+import MemberInfoEdit from './components/list/MemberInfoEdit';
 
 function App() {
   return (
@@ -31,6 +32,7 @@ function App() {
         <Route path="/movie/search" element={<SearchPage />} />
         <Route path="/search-details/:movieCd" element={<MovieDetails />} />
         <Route path="/movie/view" element={<ViewPage />} />
+        <Route path="/edit/:memberId" element={<MemberInfoEdit />} />
         {/* 네비게이션이 포함된 라우터 */}
         <Route
           path="/"
@@ -44,6 +46,7 @@ function App() {
                 <Route path="/movie/search" element={<SearchPage />} />
                 <Route path="/search-details/:movieCd" element={<MovieDetails />} />
                 <Route path="/movie/view" element={<ViewPage />} />
+                <Route path="/edit/:memberId" element={<MemberInfoEdit />} />
               </Routes>
             </>
           }

@@ -41,8 +41,8 @@ const LoginPage = () => {
         alert(message);
         
         // 토큰과 멤버 ID 저장
-        localStorage.setItem('token', accessToken);
-        localStorage.setItem('memberId', memberId); // 멤버 ID 저장
+        localStorage.setItem('userId', memberId); // 반드시 userId로 저장
+        localStorage.setItem('token', accessToken); // 토큰 저장
         
         console.log('Login successful. Navigating to main...');
         

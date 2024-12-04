@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import '../styles/Navbar.css'; // 스타일 파일 경로
 import { FiLogOut, FiSearch } from 'react-icons/fi'; // 로그아웃, 검색 아이콘 추가
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faFilm } from '@fortawesome/free-solid-svg-icons';
 
 function Navbar() {
   const [searchQuery, setSearchQuery] = useState(''); // 검색어 상태 관리
@@ -61,13 +63,13 @@ function Navbar() {
   return (
     <nav className="navbar">
       <div className="navbar-container">
-        <div className="logo">
-          <img src="/icons/group-icon.png" alt="Logo" />
-        </div>
+      <div className="logo">
+        <FontAwesomeIcon icon={faFilm} size="2x" alt="Movie Icon" />
+      </div>
         <ul className="nav-links">
           <li><a href="/main">Home</a></li>
-          <li><a href="/member/my">마이 페이지</a></li>
           <li><a href="/recommend">영화 추천</a></li>
+          <li><a href="/member/my">마이 페이지</a></li>
         </ul>
         <div className="search-bar">
           <input

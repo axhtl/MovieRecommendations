@@ -1,52 +1,62 @@
 import React, { useEffect, useState } from 'react';
 import Navbar from '../ui/Navbar';
+import MemberInfo from '../list/MemberInfo';
 import '../styles/MyPage.css';
 import axios from 'axios';
 
 const MyPage = () => {
   const [memberInfo, setMemberInfo] = useState(null);
-  const [surveyInfo, setSurveyInfo] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    // 회원 정보를 불러오는 함수
+    const userId = localStorage.getItem('userId'); // LocalStorage에서 userId 가져오기
+    const token = localStorage.getItem('token'); // LocalStorage에서 token 가져오기
+
+    // userId와 token 값 확인
+    if (!userId || !token) {
+      console.error('LocalStorage 값이 없습니다. userId 또는 token을 확인하세요.');
+      setError('로그인 정보가 없습니다. 로그인 후 이용해주세요.');
+      setLoading(false);
+      return;
+    }
+
     const fetchMemberInfo = async () => {
       try {
-        const response = await axios.get('/member/signup'); // 회원 정보 API 호출
-        setMemberInfo(response.data);
-      } catch (error) {
-        console.error('회원 정보 불러오기 오류:', error);
-      }
-    };
+        console.log(`Fetching data for memberId: ${userId}`); // userId는 실제로 memberId
+        const response = await axios.get(`/survey/${userId}`, {
+          headers: {
+            Authorization: `Bearer ${token}`, // 토큰 추가
+          },
+        });
 
-    // 설문조사 정보를 불러오는 함수
-    const fetchSurveyInfo = async () => {
-      try {
-        const response = await axios.get('/survey'); // 설문조사 정보 API 호출
-        setSurveyInfo(response.data);
+        console.log('응답 데이터:', response.data);
+        setMemberInfo(response.data); // 상태 업데이트
       } catch (error) {
-        console.error('설문조사 정보 불러오기 오류:', error);
+        console.error('API 호출 오류:', error.response || error.message);
+        if (error.response?.status === 401) {
+          setError('인증이 만료되었습니다. 다시 로그인해주세요.');
+        } else if (error.response?.status === 404) {
+          setError('회원 정보를 찾을 수 없습니다.');
+        } else {
+          setError('서버로부터 데이터를 불러오지 못했습니다.');
+        }
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchMemberInfo();
-    fetchSurveyInfo();
   }, []);
 
-  if (!memberInfo || !surveyInfo) {
-    return <p>Loading...</p>; // 데이터를 불러오는 동안 로딩 메시지 표시
-  }
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>{error}</p>;
 
   return (
     <div className="my-page">
       <Navbar />
-      <div className="my-info">
-        <h2>내 정보</h2>
-        <p><strong>닉네임:</strong> {memberInfo.nickname}</p>
-        <p><strong>로그인 아이디:</strong> {memberInfo.membername}</p>
-        <p><strong>성별:</strong> {surveyInfo.gender}</p>
-        <p><strong>나이:</strong> {surveyInfo.age}</p>
-      </div>
-      <button className="update-button">수정</button>
+        <MemberInfo data={memberInfo} />
+      
     </div>
   );
 };

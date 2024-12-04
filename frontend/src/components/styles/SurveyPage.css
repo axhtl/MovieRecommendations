@@ -114,6 +114,7 @@ button[type="submit"]:hover {
     display: flex;
     align-items: center;
     gap: 5px;
+    justify-content: flex-start;
   }
   
   .actor-item button {

@@ -1,82 +1,49 @@
-/* MyPage.css */
-
 .my-page {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    background-color: #f0f0f0;
-    height: 100vh;
-    padding-top: 60px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: #f0f0f0;
+  height: 100vh;
+  padding-top: 60px;
 }
 
 .my-page-content {
-    width: 80%;
-    max-width: 1200px;
-    background: #fff;
-    padding: 40px;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    margin-top: 20px;
+  width: 80%;
+  max-width: 1200px;
+  background: #fff;
+  padding: 40px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  margin-top: 20px;
 }
 
 .user-info {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 40px;
 }
 
 .user-info h2 {
-    margin-bottom: 10px;
-    color: #333;
+  margin-bottom: 10px;
+  color: #333;
 }
 
 .user-info p {
-    margin: 5px 0;
-    color: #555;
+  margin: 5px 0;
+  color: #555;
 }
 
 .edit-button {
-    padding: 10px 20px;
-    background-color: #333;
-    color: #fff;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s;
+  padding: 10px 20px;
+  background-color: #333;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
 }
 
 .edit-button:hover {
-    background-color: #555;
-}
-
-.my-movies {
-    margin-top: 40px;
-}
-
-.movie-list {
-    display: flex;
-    gap: 20px;
-    flex-wrap: wrap;
-}
-
-.movie-item {
-    width: 180px;
-    text-align: center;
-    background: #f9f9f9;
-    padding: 15px;
-    border-radius: 10px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.movie-item img {
-    width: 100%;
-    height: auto;
-    border-radius: 5px;
-    margin-bottom: 10px;
-}
-
-.movie-item p {
-    color: #333;
-    font-size: 16px;
+  background-color: #555;
 }

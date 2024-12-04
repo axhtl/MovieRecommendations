@@ -11,12 +11,16 @@ const genresList = [
 const SurveyPage = () => {
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
-  const userId = searchParams.get('userId'); // URL에서 userId 가져오기 (여기서 수정)
+  const userId = searchParams.get('userId');
+  const password = searchParams.get('password');
+  const membername = searchParams.get('membername');
 
   const navigate = useNavigate();
   const [actors, setActors] = useState('');
   const [actorList, setActorList] = useState([]);
   const [selectedGenres, setSelectedGenres] = useState([]);
+  const [gender, setGender] = useState('');
+  const [age, setAge] = useState('');
 
   const addActor = () => {
     if (actors.trim() !== '') {
@@ -25,11 +29,13 @@ const SurveyPage = () => {
     }
   };
 
+  // 추가된 함수: removeActor
   const removeActor = (index) => {
     const newActorList = actorList.filter((_, i) => i !== index);
     setActorList(newActorList);
   };
 
+  // 추가된 함수: handleGenreChange
   const handleGenreChange = (genre) => {
     if (selectedGenres.includes(genre)) {
       setSelectedGenres(selectedGenres.filter((item) => item !== genre));
@@ -38,41 +44,69 @@ const SurveyPage = () => {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!userId) {
-      console.error('User ID is missing from the URL.');
+    if (!userId || !password) {
       alert('회원 정보를 찾을 수 없습니다. 다시 시도해 주세요.');
       return;
     }
 
+    if (!gender || !age) {
+      alert('성별과 나이를 입력해 주세요.');
+      return;
+    }
+
     const surveyData = {
-      gender: document.getElementById('gender').value,
-      age: document.getElementById('age').value,
+      gender: gender,
+      age: age,
       preferredGenres: selectedGenres,
       preferredActors: actorList,
     };
 
-    fetch(`/survey/${userId}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(surveyData),
-    })
-      .then((response) => {
-        if (response.ok) {
-          navigate('/main'); // 성공 시 메인 페이지로 이동
-        } else {
-          console.error('Error submitting survey:', response.statusText);
-          alert('설문 제출에 실패했습니다. 다시 시도해 주세요.');
-        }
-      })
-      .catch((error) => {
-        console.error('Error:', error);
-        alert('오류가 발생했습니다. 잠시 후 다시 시도해 주세요.');
+    try {
+      const response = await fetch(`/survey/${userId}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(surveyData),
       });
+
+      if (response.ok) {
+        alert('설문 제출 성공!');
+
+        const loginResponse = await fetch('/member/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            membername: membername,
+            password: password,
+          }),
+        });
+
+        if (loginResponse.ok) {
+          const loginResult = await loginResponse.json();
+          localStorage.setItem('userId', loginResult.memberId); // 반드시 userId로 저장
+          localStorage.setItem('token', loginResult.accessToken); // 토큰 저장
+
+          console.log('저장된 userId:', loginResult.memberId);
+        
+          // 메인 페이지로 이동
+          navigate('/main');
+        } else {
+          alert('자동 로그인이 실패했습니다. 로그인 페이지로 이동합니다.');
+          navigate('/member/login');
+        }
+        
+      } else {
+        alert('설문 제출에 실패했습니다. 다시 시도해 주세요.');
+      }
+    } catch (error) {
+      alert('오류가 발생했습니다. 잠시 후 다시 시도해 주세요.');
+    }
   };
 
   return (
@@ -82,11 +116,24 @@ const SurveyPage = () => {
       <form className="survey-form" onSubmit={handleSubmit}>
         <div className="form-group">
           <label htmlFor="age">나이</label>
-          <input type="number" id="age" name="age" min="10" max="100" />
+          <input
+            type="number"
+            id="age"
+            name="age"
+            min="10"
+            max="100"
+            value={age}
+            onChange={(e) => setAge(e.target.value)}
+          />
         </div>
         <div className="form-group">
           <label htmlFor="gender">성별</label>
-          <select id="gender" name="gender">
+          <select
+            id="gender"
+            name="gender"
+            value={gender}
+            onChange={(e) => setGender(e.target.value)}
+          >
             <option value="">선택하세요</option>
             <option value="M">남성</option>
             <option value="F">여성</option>
