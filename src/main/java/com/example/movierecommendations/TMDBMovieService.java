@@ -9,7 +9,9 @@ import org.springframework.stereotype.Service;
 @Service
 public class TMDBMovieService {
 
-    private final String API_URL = "https://api.themoviedb.org/3/search/movie";
+    private final OkHttpClient client = new OkHttpClient();
+    private final String SEARCH_API_URL = "https://api.themoviedb.org/3/search/movie";
+    private final String DETAIL_API_URL = "https://api.themoviedb.org/3/movie/";
 
     @Value("${tmdb.apikey}")
     private String API_KEY;
@@ -18,13 +20,12 @@ public class TMDBMovieService {
         OkHttpClient client = new OkHttpClient();
 
         String url = String.format("%s?query=%s&include_adult=%s&language=%s&page=%d",
-                API_URL, query, includeAdult, language, page);
+                SEARCH_API_URL, query, includeAdult, language, page);
 
         Request request = new Request.Builder()
                 .url(url)
                 .get()
                 .addHeader("accept", "application/json")
-//                .addHeader("Authorization", API_KEY)
                 .addHeader("Authorization", "Bearer " + API_KEY)
                 .build();
 
@@ -36,6 +37,27 @@ public class TMDBMovieService {
             }
         } catch (Exception e) {
             throw new RuntimeException("An error occurred while calling the TMDb API", e);
+        }
+    }
+
+    public String getMovieDetails(int movieId, String language) {
+        String url = DETAIL_API_URL + movieId + "?language=" + language;
+
+        Request request = new Request.Builder()
+                .url(url)
+                .get()
+                .addHeader("accept", "application/json")
+                .addHeader("Authorization","Bearer " + API_KEY)
+                .build();
+
+        try (Response response = client.newCall(request).execute()) {
+            if (response.isSuccessful() && response.body() != null) {
+                return response.body().string();
+            } else {
+                throw new RuntimeException("Failed to fetch movie details: " + response.code());
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Error while calling API: " + e.getMessage(), e);
         }
     }
 }
