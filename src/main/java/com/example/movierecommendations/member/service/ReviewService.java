@@ -29,8 +29,7 @@ public class ReviewService {
     private final MovieInfoRepository movieInfoRepository;
     private final MovieGenreRepository movieGenreRepository;
     private final MovieActorRepository movieActorRepository;
-//    private final MovieGenreRepository movieGenreRepository;
-//    private final MovieDirectorRepository movieDirectorRepository;
+    private final MovieDirectorRepository movieDirectorRepository;
 
     @Transactional
     public Long saveReview(Long memberId, CreateReviewRequestDTO request) {
@@ -82,23 +81,8 @@ public class ReviewService {
             // 영화 출연진 정보 저장
             saveMovieActors(movieId, reviewId, movieInfo);
 
-//            // 장르 리스트 처리
-//            JsonNode genresNode = jsonNode.get("genres");
-//            if (genresNode != null && genresNode.isArray()) {
-//                for (JsonNode genreNode : genresNode) {
-//                    String genre = genreNode.get("name").asText();
-//
-//                    // MovieGenre 객체 생성 및 저장
-//                    MovieGenre movieGenre = MovieGenre.builder()
-//                            .movieInfo(movieInfo)  // MovieInfo와 연관 설정
-//                            .reviewId(reviewId)
-//                            .genre(genre)
-//                            .build();
-//
-//                    movieGenreRepository.save(movieGenre);
-//                    logger.info("MovieGenre saved for movie ID {}: {}", movieId, genre);
-//                }
-//            }
+            // 영화 감독 정보 저장
+            saveMovieDirectors(movieId, reviewId, movieInfo);
 
         } catch (Exception e) {
             logger.error("Error while saving MovieInfo for movie ID {}: {}", movieId, e.getMessage());
@@ -154,6 +138,36 @@ public class ReviewService {
         } catch (Exception e) {
             logger.error("Error while saving actors for movie ID {}: {}", movieId, e.getMessage());
             throw new RuntimeException("Error while saving actors: " + e.getMessage());
+        }
+    }
+
+    private void saveMovieDirectors(int movieId, long reviewId, MovieInfo movieInfo) {
+        try {
+            // TMDB 크레딧 API 호출 (제작진 정보)
+            String creditsResponse = tmdbMovieService.getMovieCredits(movieId, "ko");
+            JsonNode creditsNode = objectMapper.readTree(creditsResponse);
+
+            // 감독 정보 추출 (job이 "Director"인 사람들만)
+            for (JsonNode crewMember : creditsNode.get("crew")) {
+                if ("Director".equals(crewMember.get("job").asText())) {
+                    String directorName = crewMember.get("name").asText();
+
+                    // MovieDirector 객체 생성
+                    MovieDirector movieDirector = MovieDirector.builder()
+                            .movieInfo(movieInfo)
+                            .reviewId(reviewId)
+                            .director(directorName)
+                            .build();
+
+                    // MovieDirector 저장
+                    movieDirectorRepository.save(movieDirector);
+                    logger.info("Director {} saved for movie ID {}", directorName, movieId);
+                }
+            }
+
+        } catch (Exception e) {
+            logger.error("Error while saving MovieDirectors for movie ID {}: {}", movieId, e.getMessage());
+            throw new RuntimeException("Error while saving MovieDirectors: " + e.getMessage());
         }
     }
 
