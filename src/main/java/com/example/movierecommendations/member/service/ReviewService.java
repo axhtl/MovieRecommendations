@@ -1,6 +1,6 @@
 package com.example.movierecommendations.member.service;
 
-import com.example.movierecommendations.TMDBMovieService;
+import com.example.movierecommendations.TMDB.TMDBAPIService;
 import com.example.movierecommendations.member.domain.Member;
 import com.example.movierecommendations.member.domain.MovieInfo;
 import com.example.movierecommendations.member.domain.Review;
@@ -8,7 +8,6 @@ import com.example.movierecommendations.member.dto.review.CreateReviewRequestDTO
 import com.example.movierecommendations.member.repository.MemberRepository;
 import com.example.movierecommendations.member.repository.MovieInfoRepository;
 import com.example.movierecommendations.member.repository.ReviewRepository;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +27,7 @@ public class ReviewService {
     @Value("${movie.apikey}")
     private String API_KEY;
 
-    private final TMDBMovieService tmdbMovieService;
+    private final TMDBAPIService tmdbMovieService;
     private final MemberRepository memberRepository;
     private final ReviewRepository reviewRepository;
     private final MovieInfoRepository movieInfoRepository;

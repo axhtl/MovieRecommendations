@@ -1,4 +1,4 @@
-package com.example.movierecommendations;
+package com.example.movierecommendations.TMDB;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -8,9 +8,9 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/movies")
 @RequiredArgsConstructor
-public class TMDBMovieController {
+public class TMDBAPIController {
 
-    private final TMDBMovieService TMDBMovieService;
+    private final TMDBAPIService TMDBMovieService;
     private final ObjectMapper objectMapper = new ObjectMapper(); // ObjectMapper 추가
 
     // 영화 검색

@@ -1,4 +1,4 @@
-package com.example.movierecommendations;
+package com.example.movierecommendations.TMDB;
 
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Service
-public class TMDBMovieService {
+public class TMDBAPIService {
 
     private final OkHttpClient client = new OkHttpClient();
     private final String SEARCH_API_URL = "https://api.themoviedb.org/3/search/movie";
