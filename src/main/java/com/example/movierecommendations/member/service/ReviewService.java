@@ -1,15 +1,9 @@
 package com.example.movierecommendations.member.service;
 
 import com.example.movierecommendations.TMDB.TMDBAPIService;
-import com.example.movierecommendations.member.domain.Member;
-import com.example.movierecommendations.member.domain.MovieGenre;
-import com.example.movierecommendations.member.domain.MovieInfo;
-import com.example.movierecommendations.member.domain.Review;
+import com.example.movierecommendations.member.domain.*;
 import com.example.movierecommendations.member.dto.review.CreateReviewRequestDTO;
-import com.example.movierecommendations.member.repository.MemberRepository;
-import com.example.movierecommendations.member.repository.MovieGenreRepository;
-import com.example.movierecommendations.member.repository.MovieInfoRepository;
-import com.example.movierecommendations.member.repository.ReviewRepository;
+import com.example.movierecommendations.member.repository.*;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -34,7 +28,7 @@ public class ReviewService {
     private final ReviewRepository reviewRepository;
     private final MovieInfoRepository movieInfoRepository;
     private final MovieGenreRepository movieGenreRepository;
-//    private final MovieActorRepository movieActorRepository;
+    private final MovieActorRepository movieActorRepository;
 //    private final MovieGenreRepository movieGenreRepository;
 //    private final MovieDirectorRepository movieDirectorRepository;
 
@@ -82,27 +76,84 @@ public class ReviewService {
             movieInfoRepository.save(movieInfo);
             logger.info("MovieInfo saved successfully for movie ID {}", movieId);
 
-            // 장르 리스트 처리
-            JsonNode genresNode = jsonNode.get("genres");
-            if (genresNode != null && genresNode.isArray()) {
-                for (JsonNode genreNode : genresNode) {
-                    String genre = genreNode.get("name").asText();
+            // 장르 정보 저장
+            saveMovieGenres(movieId, reviewId, movieInfo);
 
-                    // MovieGenre 객체 생성 및 저장
-                    MovieGenre movieGenre = MovieGenre.builder()
-                            .movieInfo(movieInfo)  // MovieInfo와 연관 설정
-                            .reviewId(reviewId)
-                            .genre(genre)
-                            .build();
+            // 영화 출연진 정보 저장
+            saveMovieActors(movieId, reviewId, movieInfo);
 
-                    movieGenreRepository.save(movieGenre);
-                    logger.info("MovieGenre saved for movie ID {}: {}", movieId, genre);
-                }
-            }
+//            // 장르 리스트 처리
+//            JsonNode genresNode = jsonNode.get("genres");
+//            if (genresNode != null && genresNode.isArray()) {
+//                for (JsonNode genreNode : genresNode) {
+//                    String genre = genreNode.get("name").asText();
+//
+//                    // MovieGenre 객체 생성 및 저장
+//                    MovieGenre movieGenre = MovieGenre.builder()
+//                            .movieInfo(movieInfo)  // MovieInfo와 연관 설정
+//                            .reviewId(reviewId)
+//                            .genre(genre)
+//                            .build();
+//
+//                    movieGenreRepository.save(movieGenre);
+//                    logger.info("MovieGenre saved for movie ID {}: {}", movieId, genre);
+//                }
+//            }
 
         } catch (Exception e) {
             logger.error("Error while saving MovieInfo for movie ID {}: {}", movieId, e.getMessage());
             throw new RuntimeException("Error while saving MovieInfo: " + e.getMessage());
+        }
+    }
+
+    private void saveMovieGenres(int movieId, long reviewId, MovieInfo movieInfo) {
+        try {
+            String movieInfoResponse = tmdbMovieService.getMovieDetails(movieId, "ko");
+            JsonNode jsonNode = objectMapper.readTree(movieInfoResponse);
+
+            JsonNode genresNode = jsonNode.get("genres");
+            if (genresNode != null) {
+                for (JsonNode genreNode : genresNode) {
+                    String genre = genreNode.get("name").asText();
+                    MovieGenre movieGenre = MovieGenre.builder()
+                            .movieInfo(movieInfo)
+                            .reviewId(reviewId)
+                            .genre(genre)
+                            .build();
+                    movieGenreRepository.save(movieGenre);
+                    logger.info("Saved genre: {}", genre);
+                }
+            }
+        } catch (Exception e) {
+            logger.error("Error while saving genres for movie ID {}: {}", movieId, e.getMessage());
+            throw new RuntimeException("Error while saving genres: " + e.getMessage());
+        }
+    }
+
+    private void saveMovieActors(int movieId, long reviewId, MovieInfo movieInfo) {
+        try {
+            // TMDB API 호출 (영화 출연진)
+            String movieCreditsResponse = tmdbMovieService.getMovieCredits(movieId, "ko");
+            JsonNode creditsNode = objectMapper.readTree(movieCreditsResponse);
+
+            JsonNode castNode = creditsNode.get("cast");
+            if (castNode != null) {
+                for (JsonNode actorNode : castNode) {
+                    String actorName = actorNode.get("name").asText();
+
+                    // MovieActor 객체 생성 및 저장
+                    MovieActor movieActor = MovieActor.builder()
+                            .movieInfo(movieInfo)
+                            .reviewId(reviewId)
+                            .actor(actorName)
+                            .build();
+                    movieActorRepository.save(movieActor);
+                    logger.info("Saved actor: {}", actorName);
+                }
+            }
+        } catch (Exception e) {
+            logger.error("Error while saving actors for movie ID {}: {}", movieId, e.getMessage());
+            throw new RuntimeException("Error while saving actors: " + e.getMessage());
         }
     }
 
