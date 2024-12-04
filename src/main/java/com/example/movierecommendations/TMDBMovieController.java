@@ -36,7 +36,7 @@ public class TMDBMovieController {
     }
 
     // 영화 상세정보 검색
-    @GetMapping("/{movieId}")
+    @GetMapping("/detail/{movieId}")
     public ResponseEntity<String> getMovieDetails(
             @PathVariable int movieId,
             @RequestParam(required = false, defaultValue = "ko") String language) {
@@ -51,6 +51,25 @@ public class TMDBMovieController {
             return ResponseEntity.ok(formattedJson);
         } catch (Exception e) {
             return ResponseEntity.status(500).body("Error formatting JSON response.");
+        }
+    }
+
+    // 영화 크레딧 정보 검색
+    @GetMapping("/{movieId}/credits")
+    public ResponseEntity<String> getMovieCredits(
+            @PathVariable int movieId,
+            @RequestParam(defaultValue = "ko") String language) {
+
+        String jsonResponse = TMDBMovieService.getMovieCredits(movieId, language);
+
+        try {
+            // JSON 포맷팅
+            String formattedJson = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(
+                    objectMapper.readTree(jsonResponse)
+            );
+            return ResponseEntity.ok(formattedJson);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("JSON 포맷팅 중 오류 발생.");
         }
     }
 }
