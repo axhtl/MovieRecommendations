@@ -2,10 +2,12 @@ package com.example.movierecommendations.member.service;
 
 import com.example.movierecommendations.TMDB.TMDBAPIService;
 import com.example.movierecommendations.member.domain.Member;
+import com.example.movierecommendations.member.domain.MovieGenre;
 import com.example.movierecommendations.member.domain.MovieInfo;
 import com.example.movierecommendations.member.domain.Review;
 import com.example.movierecommendations.member.dto.review.CreateReviewRequestDTO;
 import com.example.movierecommendations.member.repository.MemberRepository;
+import com.example.movierecommendations.member.repository.MovieGenreRepository;
 import com.example.movierecommendations.member.repository.MovieInfoRepository;
 import com.example.movierecommendations.member.repository.ReviewRepository;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -31,6 +33,7 @@ public class ReviewService {
     private final MemberRepository memberRepository;
     private final ReviewRepository reviewRepository;
     private final MovieInfoRepository movieInfoRepository;
+    private final MovieGenreRepository movieGenreRepository;
 //    private final MovieActorRepository movieActorRepository;
 //    private final MovieGenreRepository movieGenreRepository;
 //    private final MovieDirectorRepository movieDirectorRepository;
@@ -79,6 +82,24 @@ public class ReviewService {
             movieInfoRepository.save(movieInfo);
             logger.info("MovieInfo saved successfully for movie ID {}", movieId);
 
+            // 장르 리스트 처리
+            JsonNode genresNode = jsonNode.get("genres");
+            if (genresNode != null && genresNode.isArray()) {
+                for (JsonNode genreNode : genresNode) {
+                    String genre = genreNode.get("name").asText();
+
+                    // MovieGenre 객체 생성 및 저장
+                    MovieGenre movieGenre = MovieGenre.builder()
+                            .movieInfo(movieInfo)  // MovieInfo와 연관 설정
+                            .reviewId(reviewId)
+                            .genre(genre)
+                            .build();
+
+                    movieGenreRepository.save(movieGenre);
+                    logger.info("MovieGenre saved for movie ID {}: {}", movieId, genre);
+                }
+            }
+
         } catch (Exception e) {
             logger.error("Error while saving MovieInfo for movie ID {}: {}", movieId, e.getMessage());
             throw new RuntimeException("Error while saving MovieInfo: " + e.getMessage());
@@ -88,7 +109,7 @@ public class ReviewService {
     @Transactional
     public void deleteReviewById(Long reviewId) {
         // 존재 여부 확인 후 삭제
-        Review review = reviewRepository.findById(reviewId)
+        reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new RuntimeException("Review not found"));
 
         // MovieInfo 테이블에서 reviewId로 삭제
