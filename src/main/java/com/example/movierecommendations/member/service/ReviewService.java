@@ -84,4 +84,17 @@ public class ReviewService {
             throw new RuntimeException("Error while saving MovieInfo: " + e.getMessage());
         }
     }
+
+    @Transactional
+    public void deleteReviewById(Long reviewId) {
+        // 존재 여부 확인 후 삭제
+        Review review = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new RuntimeException("Review not found"));
+
+        // MovieInfo 테이블에서 reviewId로 삭제
+        movieInfoRepository.deleteByReviewId(reviewId);
+
+        // Review 테이블에서 삭제
+        reviewRepository.deleteById(reviewId);
+    }
 }
