@@ -13,7 +13,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity(name = "recommendations")
+@Entity(name = "recommendation")
 public class Recommendation {
 
     @Id
@@ -25,7 +25,7 @@ public class Recommendation {
     private Member member;  // 추천 리스트가 속한 회원
 
     @ElementCollection
-    @CollectionTable(name = "movie_recommendations", joinColumns = @JoinColumn(name = "recommendation_id"))
+    @CollectionTable(name = "movie_recommendation", joinColumns = @JoinColumn(name = "recommendation_id"))
     @Column(name = "movie_info")  // 영화 제목과 추천 이유를 담은 문자열로 저장
     private List<String> recommendedMovies;  // 추천 영화 리스트 (영화 제목과 추천 이유 포함)
 
