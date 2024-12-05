@@ -8,6 +8,8 @@ import com.example.movierecommendations.member.repository.MemberRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class LlmRecommendationService {
 
@@ -20,19 +22,16 @@ public class LlmRecommendationService {
         this.memberRepository = memberRepository;
     }
 
-    // LLM 추천 리스트 저장
-    public void saveRecommendation(LlmRecommendationDTO llmRecommendationDTO) {
-        // memberId로 Member 객체 찾기
-        Member member = memberRepository.findById(llmRecommendationDTO.getMemberId())
+    public void saveRecommendationForMember(Long memberId, List<String> recommendedMovies) {
+        Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new RuntimeException("Member not found"));
 
-        // LLMRecommendation 엔터티 생성
+        // LlmRecommendation 엔티티 생성 및 저장
         LlmRecommendation llmRecommendation = LlmRecommendation.builder()
                 .member(member)
-                .llmRecommendations(llmRecommendationDTO.getLlmRecommendations()) // LLM 추천 영화 리스트 설정
+                .llmRecommendations(recommendedMovies)
                 .build();
 
-        // LLMRecommendation 저장
         llmRecommendationRepository.save(llmRecommendation);
     }
 
@@ -40,5 +39,21 @@ public class LlmRecommendationService {
     public LlmRecommendation getRecommendationByMemberId(Long memberId) {
         return llmRecommendationRepository.findByMember_MemberId(memberId)
                 .orElseThrow(() -> new RuntimeException("Recommendation not found for memberId: " + memberId));
+    }
+
+    // LlmRecommendationDTO를 기반으로 추천을 저장
+    public void saveRecommendation(LlmRecommendationDTO llmRecommendationDTO) {
+        // 1. DTO에서 memberId를 사용하여 Member 객체를 찾기
+        Member member = memberRepository.findById(llmRecommendationDTO.getMemberId())
+                .orElseThrow(() -> new RuntimeException("Member not found with ID: " + llmRecommendationDTO.getMemberId()));
+
+        // 2. DTO에서 받은 추천 영화 목록을 사용하여 LlmRecommendation 엔티티 생성
+        LlmRecommendation llmRecommendation = LlmRecommendation.builder()
+                .member(member)  // 찾은 회원을 연결
+                .llmRecommendations(llmRecommendationDTO.getLlmRecommendations())  // 추천 영화 리스트 설정
+                .build();
+
+        // 3. 엔티티 저장
+        llmRecommendationRepository.save(llmRecommendation);
     }
 }

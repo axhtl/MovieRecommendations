@@ -8,6 +8,9 @@ import com.example.movierecommendations.member.repository.MemberRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
+import java.util.List;
+
 @Service
 public class HrmRecommendationService {
 
@@ -26,20 +29,36 @@ public class HrmRecommendationService {
                 .orElseThrow(() -> new RuntimeException("Recommendation not found for memberId: " + memberId));
     }
 
-    // 추천 리스트 저장
-    public void saveRecommendation(HrmRecommendationDTO hrmRecommendationDTO) {
-        // memberId로 Member 객체를 찾기
-        Member member = memberRepository.findById(hrmRecommendationDTO.getMemberId())
+    public void saveRecommendationForMember(Long memberId, List<String> recommendedMovies) {
+        Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new RuntimeException("Member not found"));
 
-        // HrmRecommendation 엔티티 생성
+        // HRMRecommendation 엔티티 생성 및 저장
         HrmRecommendation hrmRecommendation = HrmRecommendation.builder()
                 .member(member)
-                .hybridRecommendations(hrmRecommendationDTO.getHybridRecommendations())  // DTO에서 하이브리드 추천 리스트 가져오기
-                .similarMovies(hrmRecommendationDTO.getSimilarMovies())  // DTO에서 유사 영화 리스트 가져오기
+                .hybridRecommendations(recommendedMovies)
                 .build();
 
-        // 엔티티를 저장
+        hrmRecommendationRepository.save(hrmRecommendation);
+    }
+
+    public void saveRecommendation(HrmRecommendationDTO hrmRecommendationDTO) {
+        // 1. DTO에서 memberId를 사용하여 Member 객체를 찾기
+        Member member = memberRepository.findById(hrmRecommendationDTO.getMemberId())
+                .orElseThrow(() -> new RuntimeException("Member not found with ID: " + hrmRecommendationDTO.getMemberId()));
+
+        // 2. DTO에서 받은 추천 영화 목록과 유사 영화 목록을 사용하여 HrmRecommendation 엔티티 생성
+        HrmRecommendation hrmRecommendation = HrmRecommendation.builder()
+                .member(member)  // 찾은 회원을 연결
+                .hybridRecommendations(hrmRecommendationDTO.getHybridRecommendations())  // 하이브리드 추천 영화 목록 설정
+                .similarMovies(hrmRecommendationDTO.getSimilarMovies())  // 유사 영화 목록 설정
+                .build();
+
+        // 3. HrmRecommendation 엔티티를 데이터베이스에 저장
         hrmRecommendationRepository.save(hrmRecommendation);
     }
 }
+
+
+
+
