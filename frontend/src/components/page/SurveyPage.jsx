@@ -12,8 +12,6 @@ const SurveyPage = () => {
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
   const userId = searchParams.get('userId');
-  const password = searchParams.get('password');
-  const membername = searchParams.get('membername');
 
   const navigate = useNavigate();
   const [actors, setActors] = useState('');
@@ -29,13 +27,11 @@ const SurveyPage = () => {
     }
   };
 
-  // 추가된 함수: removeActor
   const removeActor = (index) => {
     const newActorList = actorList.filter((_, i) => i !== index);
     setActorList(newActorList);
   };
 
-  // 추가된 함수: handleGenreChange
   const handleGenreChange = (genre) => {
     if (selectedGenres.includes(genre)) {
       setSelectedGenres(selectedGenres.filter((item) => item !== genre));
@@ -46,16 +42,6 @@ const SurveyPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    if (!userId || !password) {
-      alert('회원 정보를 찾을 수 없습니다. 다시 시도해 주세요.');
-      return;
-    }
-
-    if (!gender || !age) {
-      alert('성별과 나이를 입력해 주세요.');
-      return;
-    }
 
     const surveyData = {
       gender: gender,
@@ -75,32 +61,7 @@ const SurveyPage = () => {
 
       if (response.ok) {
         alert('설문 제출 성공!');
-
-        const loginResponse = await fetch('/member/login', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            membername: membername,
-            password: password,
-          }),
-        });
-
-        if (loginResponse.ok) {
-          const loginResult = await loginResponse.json();
-          localStorage.setItem('userId', loginResult.memberId); // 반드시 userId로 저장
-          localStorage.setItem('token', loginResult.accessToken); // 토큰 저장
-
-          console.log('저장된 userId:', loginResult.memberId);
-        
-          // 메인 페이지로 이동
-          navigate('/main');
-        } else {
-          alert('자동 로그인이 실패했습니다. 로그인 페이지로 이동합니다.');
-          navigate('/member/login');
-        }
-        
+        navigate('/'); // 설문 제출 후 시작 페이지로 이동
       } else {
         alert('설문 제출에 실패했습니다. 다시 시도해 주세요.');
       }

@@ -7,6 +7,7 @@
     background-color: #f0f0f0;
     height: 100vh;
     padding-top: 20px;
+    margin-top: 40px;
 }
 
 .main-content {
@@ -50,7 +51,7 @@
 .movie-section {
     display: flex;
     justify-content: space-between;
-    margin-top: 40px;
+    margin-top: 0px;
 }
 
 .my-movies, .recommended-movies {
@@ -59,17 +60,30 @@
 
 .movie-list {
     display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
+    flex-direction: row; /* 가로로 정렬 */
+    overflow-x: auto; /* 가로 스크롤 활성화 */
+    gap: 15px; /* 카드 간격 */
+    padding: 20px 0;
+    scrollbar-width: none; /* 스크롤바 숨김 (Firefox) */
 }
 
+.movie-list::-webkit-scrollbar {
+    display: none; /* 스크롤바 숨김 (Chrome, Edge) */
+} 
+
 .movie-item {
-    width: 150px;
+    flex: 0 0 auto;
+    width: 200px;
     text-align: center;
     background: #f9f9f9;
     padding: 10px;
     border-radius: 5px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s;
+}
+
+.movie-item:hover {
+    transform: scale(1.1); /* 마우스 hover 시 확대 */
 }
 
 .movie-item img {

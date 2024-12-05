@@ -30,7 +30,7 @@ const ViewPage = () => {
   // 영화 클릭 시 영화 상세 페이지로 이동하는 함수
   const handleMovieClick = (movieId) => {
     console.log('Navigating to movie details with ID:', movieId); // 로그 추가
-    navigate(`/search-details/${movieId}`);
+    navigate(`/api/movies/detail/${movieId}?language=ko`);
   };
 
   return (

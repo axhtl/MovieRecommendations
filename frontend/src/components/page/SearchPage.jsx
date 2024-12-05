@@ -6,7 +6,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 
 const SearchPage = () => {
   const [searchResults, setSearchResults] = useState([]);
-  const [searchTerm, setSearchTerm] = useState(''); // 검색어 상태 관리
+  const [searchTerm, setSearchTerm] = useState('');
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -14,7 +14,7 @@ const SearchPage = () => {
     // URL에서 쿼리 파라미터 추출
     const queryParams = new URLSearchParams(location.search);
     const results = queryParams.get('results');
-    const query = queryParams.get('query'); // 검색어 추출
+    const query = queryParams.get('query');
 
     try {
       const parsedResults = results ? JSON.parse(decodeURIComponent(results)) : [];
@@ -24,13 +24,13 @@ const SearchPage = () => {
     }
 
     if (query) {
-      setSearchTerm(query); // 검색어 저장
+      setSearchTerm(query);
     }
   }, [location.search]);
 
   const handleMovieClick = (movieId) => {
-    console.log('Navigating to movie details with ID:', movieId); // 로그 추가
-    navigate(`/search-details/${movieId}`);
+    console.log('Navigating to movie details with ID:', movieId);
+    navigate(`/api/movies/detail/${movieId}?language=ko`); // 경로에 쿼리 파라미터 포함
   };
 
   return (
@@ -38,7 +38,7 @@ const SearchPage = () => {
       <Navbar />
       <div className="search-content">
         {searchResults.length === 0 && (
-          <p className="no-results-message">검색 결과가 없습니다.</p> // 검색 결과가 없을 때 메시지 표시
+          <p className="no-results-message">검색 결과가 없습니다.</p>
         )}
         {searchResults.length > 0 && (
           <div className="movie-category">

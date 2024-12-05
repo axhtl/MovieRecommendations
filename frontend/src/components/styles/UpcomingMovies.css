@@ -1,49 +1,60 @@
 .upcoming-movies {
-  margin-top: 20px;
+  margin-top: 24px;
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .upcoming-movies h2 {
-  margin-bottom: 20px;
-  font-size: 20px;
+  font-size: 19px;
   color: #333;
-  text-align: center; /* 제목 중앙 정렬 */
+  text-align: left;
+  margin-bottom: 7px;
+  font-weight: 600;
 }
 
 .movie-list {
-  display: grid; /* CSS Grid 사용 */
-  grid-template-columns: repeat(3, 1fr); /* 한 행에 2개 */
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* 3개의 카드가 가로로 나열 */
   gap: 20px; /* 카드 간 간격 */
-  justify-content: center; /* 수평 중앙 정렬 */
+  justify-items: center; /* 카드를 가운데 정렬 */
+  grid-auto-rows: minmax(200px, auto); /* 카드의 최소 높이를 설정 */
 }
 
 .movie-card {
-  text-align: center;
   background-color: #fff;
-  border-radius: 10px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  padding: 10px;
+  border-radius: 6px;
+  padding: 15px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
   cursor: pointer;
-  transition: transform 0.3s ease;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  overflow: hidden;
+  max-width: 240px; /* 카드 최대 너비 설정 */
+  text-align: center;
 }
 
 .movie-card:hover {
-  transform: scale(1.05); /* 호버 시 확대 효과 */
+  transform: translateY(-5px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* 호버 시 그림자 강조 */
 }
 
 .movie-poster {
   width: 100%;
   border-radius: 10px;
+  height: 150px; /* 고정된 높이 */
+  object-fit: cover;
 }
 
 .movie-title {
-  font-size: 14px;
-  font-weight: bold;
+  font-size: 16px;
+  font-weight: 600;
   color: #333;
-  margin-top: 10px;
+  margin-top: 15px;
 }
 
 .movie-release-date {
   font-size: 12px;
-  color: #666;
+  color: #888;
   margin-top: 5px;
 }

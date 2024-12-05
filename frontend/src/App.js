@@ -22,15 +22,15 @@ function App() {
         {/* 회원 관련 경로 */}
         <Route path="/member/signup" element={<RegisterPage />} />
         <Route path="/member/login" element={<LoginPage />} />
-        <Route path="/member/my" element={<MyPage />} />
+        <Route path="/my/:userId" element={<MyPage />} />
         {/* 설문조사 */}
         <Route path="/survey" element={<SurveyPage />} />
         {/* 주요 페이지 */}
-        <Route path="/main" element={<MainPage />} />
+        <Route path="/main/:userId" element={<MainPage />} />
         {/* 추천 및 검색 */}
         <Route path="/recommend" element={<RecommendPage />} />
         <Route path="/movie/search" element={<SearchPage />} />
-        <Route path="/search-details/:movieCd" element={<MovieDetails />} />
+        <Route path="/api/movies/detail/:movieId" element={<MovieDetails />} />
         <Route path="/movie/view" element={<ViewPage />} />
         <Route path="/edit/:memberId" element={<MemberInfoEdit />} />
         {/* 네비게이션이 포함된 라우터 */}
@@ -40,11 +40,11 @@ function App() {
             <>
               <Navbar />
               <Routes>
-                <Route path="/main" element={<MainPage />} />
-                <Route path="/member/my" element={<MyPage />} />
+                <Route path="/main/:userId" element={<MainPage />} />
+                <Route path="/my/:userId" element={<MyPage />} />
                 <Route path="/recommend" element={<RecommendPage />} />
                 <Route path="/movie/search" element={<SearchPage />} />
-                <Route path="/search-details/:movieCd" element={<MovieDetails />} />
+                <Route path="/api/movies/detail/:movieId" element={<MovieDetails />} />
                 <Route path="/movie/view" element={<ViewPage />} />
                 <Route path="/edit/:memberId" element={<MemberInfoEdit />} />
               </Routes>

@@ -18,7 +18,7 @@ const UpcomingMovies = () => {
             region: 'KR',
           },
         });
-        setUpcomingMovies(response.data.results.slice(0, 3)); // 상위 2개 영화만 저장
+        setUpcomingMovies(response.data.results.slice(0, 2)); // 상위 2개 영화만 저장
       } catch (err) {
         console.error('개봉 예정 영화 데이터를 가져오는 중 오류 발생:', err);
         setError('영화를 불러오는 중 오류가 발생했습니다.');

@@ -1,52 +1,38 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import '../styles/StarRating.css';
 
-const StarRating = ({ onRatingChange }) => {
-  const [rating, setRating] = useState(0);
-  const [hover, setHover] = useState(0);
+const StarRating = ({ onRatingChange, rating: initialRating = 0, readOnly = false }) => {
+  const [rating, setRating] = useState(initialRating);
+  const [hover, setHover] = useState(null); // hover 상태를 null로 초기화
+
+  useEffect(() => {
+    setRating(initialRating); // 초기 별점 설정
+  }, [initialRating]);
 
   const handleRating = (value) => {
-    setRating(value);
+    if (readOnly) return; // 읽기 전용일 경우 클릭 무시
+    setRating(value); // 별점 상태 업데이트
     if (onRatingChange) {
-      onRatingChange(value);
+      onRatingChange(value); // 부모 컴포넌트에 전달
     }
   };
 
   return (
     <div className="star-rating">
       {[...Array(5)].map((_, index) => {
-        const value = index + 1;
-        const isFilled = value <= (hover || rating);
-        const isHalf = value === Math.ceil(hover || rating) && (hover || rating) % 1 !== 0;
+        const value = index + 1; // 별점 값 (1~5)
+        const isFilled = value <= (hover || rating); // hover 상태 또는 rating 상태 확인
 
         return (
           <span
             key={index}
-            className={`star ${isFilled ? 'filled' : ''} ${isHalf ? 'half' : ''}`}
-            onMouseEnter={() => setHover(index + 0.5)}
-            onMouseLeave={() => setHover(0)}
-            onClick={() => handleRating(index + 1)}
-            onContextMenu={(e) => {
-              e.preventDefault();
-              handleRating(index + 0.5);
-            }}
+            className={`star ${isFilled ? 'filled' : ''}`}
+            onMouseEnter={() => !readOnly && setHover(value)} // hover 상태 업데이트
+            onMouseLeave={() => !readOnly && setHover(null)} // hover 상태 초기화
+            onClick={() => handleRating(value)} // 별점 선택
+            style={{ cursor: readOnly ? 'default' : 'pointer' }} // 읽기 전용일 경우 커서 변경
           >
-            {isHalf ? (
-              <svg width="24" height="24" viewBox="0 0 24 24">
-                <defs>
-                  <linearGradient id={`half-grad-${index}`}>
-                    <stop offset="50%" stopColor="#ffc107" />
-                    <stop offset="50%" stopColor="#ccc" />
-                  </linearGradient>
-                </defs>
-                <path
-                  fill={`url(#half-grad-${index})`}
-                  d="M12 .587l3.668 7.431 8.209 1.193-5.938 5.787 1.405 8.188L12 18.902l-7.344 3.864 1.405-8.188L.123 9.211l8.209-1.193z"
-                />
-              </svg>
-            ) : (
-              '★'
-            )}
+            ★
           </span>
         );
       })}
