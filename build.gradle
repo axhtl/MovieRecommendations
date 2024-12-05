@@ -51,13 +51,21 @@ dependencies {
 	// OkHttpClient
 	implementation 'com.squareup.okhttp3:okhttp:4.10.0'
 }
+<<<<<<< Updated upstream
 //
+=======
+
+>>>>>>> Stashed changes
 //tasks.named('test') {
 //	useJUnitPlatform()
 //}
 //
 //
+<<<<<<< Updated upstream
 //def frontendDir = "$projectDir/src/frontend"
+=======
+//def frontendDir = "$projectDir/frontend"
+>>>>>>> Stashed changes
 //
 //sourceSets {
 //	main {
