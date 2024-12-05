@@ -49,6 +49,17 @@ public class MemberController {
         // 사용자 ID로 모든 리뷰 조회
         List<Review> reviews = reviewRepository.findByMember_MemberId(memberId);
 
+        // 선호 장르 및 선호 배우 정보 조회
+        List<String> preferredGenres = member.getPreferredGenres()
+                .stream()
+                .map(PreferredGenre::getGenre)
+                .collect(Collectors.toList());
+
+        List<String> preferredActors = member.getPreferredActor()
+                .stream()
+                .map(PreferredActor::getActor)
+                .collect(Collectors.toList());
+
         // 리뷰별 관련된 영화 정보 및 그에 대한 배우, 감독, 장르 정보 조회
         List<UserMovieInfoResponse.ReviewInfo> reviewInfos = reviews.stream().map(review -> {
             MovieInfo movieInfo = movieInfoRepository.findByReviewId(review.getReviewId());
@@ -69,6 +80,8 @@ public class MemberController {
         return UserMovieInfoResponse.builder()
                 .member(member)
                 .survey(survey)
+                .preferredGenres(preferredGenres)  // 선호 장르 추가
+                .preferredActors(preferredActors)
                 .reviewInfos(reviewInfos)
                 .build();
     }
@@ -79,6 +92,8 @@ public class MemberController {
     public static class UserMovieInfoResponse {
         private Member member;  // 사용자 정보 추가
         private Survey survey;  // 설문조사 정보 추가
+        private List<String> preferredGenres; // 선호 장르 추가
+        private List<String> preferredActors; // 선호 배우 추가
         private List<ReviewInfo> reviewInfos;  // 리뷰 정보 리스트 추가
 
         @Builder
