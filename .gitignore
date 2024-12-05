@@ -41,7 +41,7 @@ out/
 .vscode/git add .
 
 # .env 파일 무시
-.env
+*.env
 
 # .properties 파일 무시
 *.properties
