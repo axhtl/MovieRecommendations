@@ -51,6 +51,14 @@ dependencies {
 	// OkHttpClient
 	implementation 'com.squareup.okhttp3:okhttp:4.10.0'
 }
+
+
+
+tasks.withType(JavaCompile).configureEach {
+	options.compilerArgs = options.compilerArgs + ['-parameters']
+}
+
+
 //
 //tasks.named('test') {
 //	useJUnitPlatform()

@@ -16,7 +16,7 @@ public class TMDBAPIController {
     // 영화 검색
     @GetMapping("/search")
     public ResponseEntity<String> searchMovies(
-            @RequestParam String query,
+            @RequestParam("query") String query,
             @RequestParam(defaultValue = "false") boolean includeAdult,
             @RequestParam(defaultValue = "ko") String language,
             @RequestParam(defaultValue = "1") int page) {
