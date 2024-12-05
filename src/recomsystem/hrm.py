@@ -18,23 +18,39 @@ def ai_recommendation():
     # 클라이언트로부터 요청 데이터를 받아옴
     data = request.get_json()
 
-    # 요청에서 user_input (사용자 선호 데이터)과 user_behavior_data (사용자 행동 데이터) 받기
-    user_input = data.get('user_input')  # 사용자 선호 정보
-    user_behavior_data = data.get('user_behavior_data')  # 사용자 행동 데이터
-    movie_name = data.get('movie_name')  # 추가된 부분: 검색된 영화 이름을 받음
+    # 요청에서 필요한 데이터 추출
+    survey_id = data.get('surveyId')  # 설문 ID (필요에 따라 사용)
+    member_id = data.get('memberId')  # 회원 ID
+    gender = data.get('gender')  # 성별
+    age = data.get('age')  # 나이
+    preferred_genres = data.get('preferredGenres')  # 선호 장르
+    preferred_actors = data.get('preferredActors')  # 선호 배우
+    target_movie = data.get('target_movie')  # 추천할 영화 이름
 
-    if not user_input or not user_behavior_data or not movie_name:
-        return jsonify({"error": "필수 데이터가 누락되었습니다. user_input, user_behavior_data, movie_name이 필요합니다."}), 400
+    # user_input 구성
+    user_input = {
+        "gender": gender,
+        "age": age,
+        "preferredGenres": preferred_genres,
+        "preferredActors": preferred_actors
+    }
+
+    # user_behavior_data는 null로 설정
+    user_behavior_data = None
+
+    # 필수 데이터가 없는 경우 예외 처리
+    if not user_input or not target_movie:
+        return jsonify({"error": "필수 데이터가 누락되었습니다. user_input, target_movie이 필요합니다."}), 400
 
     # 추천 시스템 실행
     try:
         # 추천 함수 호출: movie_name을 타겟 영화로 사용하여 추천 시스템 실행
         hybrid_recommendations, similar_movies = do_recommendation(
             user_data=user_input,  # 사용자 선호 데이터
-            target_movie=movie_name,  # 전달받은 영화 이름을 타겟 영화로 설정
+            target_movie=target_movie,  # 전달받은 영화 이름을 타겟 영화로 설정
             df_movies=df_movies,  # 영화 데이터
             similarity_matrix=similarity_matrix,  # 영화 유사도 매트릭스
-            user_behavior_data=user_behavior_data  # 사용자 행동 데이터 (협업 필터링에 사용)
+            user_behavior_data=user_behavior_data  # 사용자 행동 데이터 (null로 설정)
         )
 
         # 추천된 영화 목록을 포함한 응답 반환
@@ -54,6 +70,15 @@ def ai_recommendation():
 
   """
     # 사용자 데이터 및 행동 데이터
+    data = {
+             "surveyId": 1,
+            "memberId" : 1,
+            "gender": "M",
+            "age": "30",
+            "preferredGenres": ["코미디"],
+            "preferredActors": ["황정민"],
+            "target_movie" : "inception"
+        }
     user_data = {
         "gender": "M",
         "age": "30",

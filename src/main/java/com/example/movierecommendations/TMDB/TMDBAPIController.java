@@ -63,6 +63,9 @@ public class TMDBAPIController {
         inputData.putAll(preferGenre);    // preferGenre을 inputData에 추가
         inputData.putAll(preferActor);    // preferActor을 inputData에 추가
 
+        // target_movie 값을 inputData에 추가
+        inputData.put("target_movie", query);  // target_movie를 inputData에 추가
+
         try {
             // JSON을 보기 좋게 포맷팅
             String formattedJson = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(objectMapper.readTree(jsonResponse));
