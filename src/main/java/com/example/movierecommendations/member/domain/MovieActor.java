@@ -16,6 +16,8 @@ public class MovieActor {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long movieActorId;
 
+    private Long reviewId;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "movieInfoId", nullable = false)
     private MovieInfo movieInfo;

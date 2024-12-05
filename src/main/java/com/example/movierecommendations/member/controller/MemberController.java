@@ -1,15 +1,23 @@
 package com.example.movierecommendations.member.controller;
 
+import com.example.movierecommendations.member.domain.*;
 import com.example.movierecommendations.member.dto.*;
+import com.example.movierecommendations.member.repository.*;
 import com.example.movierecommendations.member.service.AuthenticationService;
 import com.example.movierecommendations.member.service.MemberService;
 import com.example.movierecommendations.security.JwtTokenProvider;
+import lombok.Builder;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
@@ -19,6 +27,26 @@ public class MemberController {
     private final MemberService memberService;
     private final JwtTokenProvider jwtTokenProvider;
     private final AuthenticationService authenticationService;
+    private final MemberRepository memberRepository;
+    private final SurveyRepository surveyRepository;
+    private final ReviewRepository reviewRepository;
+    private final MovieInfoRepository movieInfoRepository;
+    private final MovieActorRepository movieActorRepository;
+    private final MovieDirectorRepository movieDirectorRepository;
+    private final MovieGenreRepository movieGenreRepository;
+
+    // 특정 사용자의 모든 정보 조회 API
+    @GetMapping(value = "/user/{memberId}", produces = "application/json")
+    public UserMovieInfoResponse getUserMovieInfo(@PathVariable Long memberId) {
+        return memberService.getUserMovieInfo(memberId);
+    }
+
+    // 전체 사용자의 모든 정보 조회 API
+    @GetMapping(value = "/users", produces = "application/json")
+    public ResponseEntity<List<UserMovieInfoResponse>> getAllUserMovieInfo() {
+        List<UserMovieInfoResponse> userMovieInfoResponses = memberService.getAllUserMovieInfo();
+        return ResponseEntity.ok(userMovieInfoResponses);
+    }
 
     // 회원가입
     @PostMapping("/signup")

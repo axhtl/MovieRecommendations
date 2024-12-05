@@ -1,9 +1,8 @@
 package com.example.movierecommendations.member.controller;
 
-import com.example.movierecommendations.member.dto.CreateSurveyRequestDTO;
+import com.example.movierecommendations.member.dto.survey.CreateSurveyRequestDTO;
 import com.example.movierecommendations.member.dto.SaveResponseDTO;
 import com.example.movierecommendations.member.dto.survey.SurveyResponseDTO;
-import com.example.movierecommendations.member.dto.survey.UpdateSurveyRequestDTO;
 import com.example.movierecommendations.member.service.SurveyService;
 import com.example.movierecommendations.member.vo.Gender;
 import lombok.RequiredArgsConstructor;
@@ -18,19 +17,13 @@ public class SurveyController {
 
     private final SurveyService surveyService;
 
+    // 설문조사 등록
     @PostMapping("/{memberId}")
     public ResponseEntity<SaveResponseDTO> saveSurvey(@PathVariable Long memberId, @RequestBody CreateSurveyRequestDTO request) {
         Long surveyId = surveyService.saveSurvey(memberId, request);
         return ResponseEntity.ok(new SaveResponseDTO(
                 surveyId, HttpStatus.OK.value(), "설문조사가 정상적으로 등록되었습니다."
         ));
-    }
-
-    // 회원정보, 설문조사정보 조회 API
-    @GetMapping("/{memberId}")
-    public ResponseEntity<SurveyResponseDTO> getSurveyByMemberId(@PathVariable Long memberId) {
-        SurveyResponseDTO surveyResponse = surveyService.getSurveyByMemberId(memberId);
-        return ResponseEntity.ok(surveyResponse);
     }
 
     // 성별 수정

@@ -20,13 +20,12 @@ public class MovieInfo {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long movieInfoId;
     private Long reviewId;
-    private String movieCd;
-    private String movieNm;
-    private String movieEn;
-    private String showTm;
-    private String openDt;
-    private String typeNm;
-    private String nations;
+    private int movieId;
+    private String title;
+    private String originalTitle;
+    private String runtime;
+    private String releaseDate;
+    private String originCountry;
     @JsonIgnore
     @OneToMany(mappedBy = "movieInfo", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<MovieActor> movieActors = new ArrayList<>();
