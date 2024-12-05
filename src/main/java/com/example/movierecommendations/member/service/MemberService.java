@@ -1,10 +1,7 @@
 package com.example.movierecommendations.member.service;
 
 import com.example.movierecommendations.member.domain.*;
-import com.example.movierecommendations.member.dto.CreateMemberRequestDTO;
-import com.example.movierecommendations.member.dto.NicknameUpdateRequestDTO;
-import com.example.movierecommendations.member.dto.PasswordUpdateRequestDTO;
-import com.example.movierecommendations.member.dto.UserMovieInfoResponse;
+import com.example.movierecommendations.member.dto.*;
 import com.example.movierecommendations.member.repository.*;
 import com.example.movierecommendations.member.vo.MemberStatus;
 import lombok.RequiredArgsConstructor;
@@ -76,6 +73,58 @@ public class MemberService {
                 .preferredActors(preferredActors) // 선호 배우
                 .reviewInfos(reviewInfos) // 리뷰 정보
                 .build();
+    }
+
+    // 전체 사용자 정보를 가져오는 서비스 메서드
+    public List<UserMovieInfoResponse> getAllUserMovieInfo() {
+        // 모든 사용자 조회
+        List<Member> members = memberRepository.findAll();
+
+        // 각 사용자에 대한 정보 조회
+        return members.stream().map(member -> {
+            // 설문조사 정보 조회
+            Survey survey = surveyRepository.findByMemberId(member.getMemberId())
+                    .orElseThrow(() -> new RuntimeException("Survey not found"));
+
+            // 사용자 ID로 모든 리뷰 조회
+            List<Review> reviews = reviewRepository.findByMember_MemberId(member.getMemberId());
+
+            // 리뷰별 영화 및 관련 정보 조회
+            List<UserMovieInfoResponse.ReviewInfo> reviewInfos = reviews.stream().map(review -> {
+                MovieInfo movieInfo = movieInfoRepository.findByReviewId(review.getReviewId());
+                List<MovieActor> actors = movieActorRepository.findByMovieInfo(movieInfo);
+                List<MovieDirector> directors = movieDirectorRepository.findByMovieInfo(movieInfo);
+                List<MovieGenre> genres = movieGenreRepository.findByMovieInfo(movieInfo);
+
+                return UserMovieInfoResponse.ReviewInfo.builder()
+                        .reviewId(review.getReviewId())
+                        .movieInfo(movieInfo)
+                        .actors(actors.stream().map(MovieActor::getActor).collect(Collectors.toList()))
+                        .directors(directors.stream().map(MovieDirector::getDirector).collect(Collectors.toList()))
+                        .genres(genres.stream().map(MovieGenre::getGenre).collect(Collectors.toList()))
+                        .build();
+            }).collect(Collectors.toList());
+
+            // 선호 장르 및 선호 배우 정보 조회
+            List<String> preferredGenres = member.getPreferredGenres()
+                    .stream()
+                    .map(PreferredGenre::getGenre)
+                    .collect(Collectors.toList());
+
+            List<String> preferredActors = member.getPreferredActor()
+                    .stream()
+                    .map(PreferredActor::getActor)
+                    .collect(Collectors.toList());
+
+            // 사용자별 정보 응답 DTO 생성
+            return UserMovieInfoResponse.builder()
+                    .member(member)
+                    .survey(survey)
+                    .reviewInfos(reviewInfos)
+                    .preferredGenres(preferredGenres)
+                    .preferredActors(preferredActors)
+                    .build();
+        }).collect(Collectors.toList());
     }
 
     // 회원가입
