@@ -20,12 +20,19 @@ public class AIController {
         this.aiModelService = aiModelService;
     }
 
-    // 추천 예측 API
+    // 설문조사 결과를 AI 모델에 보내어 추천 결과를 받음 (기존 HRM 모델)
     @PostMapping("/predict/{memberId}")
     public CompletableFuture<ResponseEntity<List<String>>> predict(@PathVariable Long memberId, @RequestBody Map<String, Object> inputData) throws IOException {
-        // AI 모델 호출하여 추천 결과를 받아옴
-        return aiModelService.callPythonAIModel(inputData, memberId)
+        return aiModelService.callHRMModel(inputData, memberId)
                 .thenApply(ResponseEntity::ok)
                 .exceptionally(ex -> ResponseEntity.status(500).body(List.of("Error occurred while calling the AI model: " + ex.getMessage())));
+    }
+
+    // 새로운 LLM 모델을 호출하여 추천 결과를 받음 (새로운 메서드 predict2)
+    @PostMapping("/predict2/{memberId}")
+    public CompletableFuture<ResponseEntity<List<String>>> predict2(@PathVariable Long memberId, @RequestBody Map<String, Object> inputData) throws IOException {
+        return aiModelService.callLLMModel(inputData, memberId)
+                .thenApply(ResponseEntity::ok)
+                .exceptionally(ex -> ResponseEntity.status(500).body(List.of("Error occurred while calling the LLM model: " + ex.getMessage())));
     }
 }

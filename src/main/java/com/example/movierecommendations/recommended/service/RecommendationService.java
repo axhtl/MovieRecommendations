@@ -18,23 +18,19 @@ public class RecommendationService {
     private final MemberRepository memberRepository;
 
     // 추천된 영화 리스트 저장
-    public void saveRecommendationList(Long memberId, List<String> movieRecommendations) {
-        // 회원 조회
+    public void saveRecommendationResult(Long memberId, List<String> recommendedMovies) {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new RuntimeException("Member not found"));
 
-        // 추천 영화 리스트를 movieInfo 형식으로 변환 (이미 String 형식이므로 그냥 저장)
-        List<String> recommendedMovies = movieRecommendations;
-
-        // Recommendation 객체 생성
+        // 추천 리스트를 Recommendation 테이블에 저장
         Recommendation recommendation = Recommendation.builder()
                 .member(member)
                 .recommendedMovies(recommendedMovies)
                 .build();
 
-        // 추천 리스트 저장
         recommendationRepository.save(recommendation);
     }
+
 
     // 추천 영화 리스트 수정 (전체 교체)
     public void modifyRecommendationList(Long recommendationId, List<String> updatedRecommendations) {

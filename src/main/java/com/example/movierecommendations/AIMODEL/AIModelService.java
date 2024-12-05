@@ -29,11 +29,11 @@ public class AIModelService {
 
     // 비동기적으로 Python AI 모델을 호출하여 추천 결과를 가져오는 메서드
     @Async
-    public CompletableFuture<List<String>> callPythonAIModel(Map<String, Object> inputData, Long memberId) throws IOException {
+    public CompletableFuture<List<String>> callHRMModel(Map<String, Object> inputData, Long memberId) throws IOException {
         logger.info("Calling Python AI model with input data: {}, for memberId: {}", inputData, memberId);
 
         String jsonData = new ObjectMapper().writeValueAsString(inputData);
-        ProcessBuilder processBuilder = new ProcessBuilder("python3", "recomsystem/main_model.py", jsonData);
+        ProcessBuilder processBuilder = new ProcessBuilder("python3", "recomsystem/hrm.py", jsonData);
         processBuilder.redirectErrorStream(true);
 
         Process process = processBuilder.start();
@@ -59,11 +59,56 @@ public class AIModelService {
         // 결과가 정상적으로 오면 추천 결과를 반환
         List<String> recommendedMovies = parseRecommendationResult(result.toString());
 
-        // 추천 결과를 저장
+        // 추천 결과를 Recommendation 테이블에 저장
         saveRecommendationResult(memberId, recommendedMovies);
 
         return CompletableFuture.completedFuture(recommendedMovies);
     }
+
+    // 비동기적으로 Python AI 모델을 호출하여 추천 결과를 가져오는 메서드
+    @Async
+    public CompletableFuture<List<String>> callLLMModel(Map<String, Object> inputData, Long memberId) throws IOException {
+        // user_prompt를 inputData에서 추출
+        String userPrompt = (String) inputData.get("user_prompt");
+        if (userPrompt == null || userPrompt.isEmpty()) {
+            throw new IllegalArgumentException("user_prompt는 필수입니다.");
+        }
+
+        // ProcessBuilder를 사용하여 Python 스크립트를 실행
+        ProcessBuilder processBuilder = new ProcessBuilder("python3", "recomsystem/llm.py", userPrompt);
+        processBuilder.redirectErrorStream(true);
+
+        // 프로세스를 시작하고, 결과를 읽기 위한 스트림 준비
+        Process process = processBuilder.start();
+        BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+        StringBuilder result = new StringBuilder();
+        String line;
+
+        // Python 스크립트에서 출력된 결과를 읽기
+        while ((line = reader.readLine()) != null) {
+            result.append(line);
+        }
+
+        try {
+            int exitCode = process.waitFor();
+            if (exitCode != 0) {
+                throw new RuntimeException("Python 스크립트 실행 실패, 종료 코드: " + exitCode);
+            }
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            logger.error("Python 스크립트 실행 중 오류 발생: {}", e.getMessage());
+            throw new RuntimeException("Python 스크립트 실행 중 오류 발생", e);
+        }
+
+        // 결과를 추천 영화 리스트로 파싱
+        List<String> recommendedMovies = parseRecommendationResult(result.toString());
+
+        // 추천 결과를 Recommendation 테이블에 저장
+        saveRecommendationResult(memberId, recommendedMovies);
+
+        return CompletableFuture.completedFuture(recommendedMovies);
+    }
+
 
     // Python AI 모델에서 반환된 결과를 List<String> 형식으로 변환
     private List<String> parseRecommendationResult(String result) {
@@ -79,6 +124,6 @@ public class AIModelService {
                 .orElseThrow(() -> new RuntimeException("Member not found"));
 
         // 추천 리스트를 Recommendation 테이블에 저장
-        recommendationService.saveRecommendationList(memberId, recommendedMovies);
+        recommendationService.saveRecommendationResult(memberId, recommendedMovies);
     }
 }

@@ -20,7 +20,7 @@ public class RecommendationController {
             @PathVariable Long memberId,
             @RequestBody List<String> movieRecommendations) {
 
-        recommendationService.saveRecommendationList(memberId, movieRecommendations);
+        recommendationService.saveRecommendationResult(memberId, movieRecommendations);
         return ResponseEntity.ok("추천 영화 리스트가 성공적으로 저장되었습니다.");
     }
 

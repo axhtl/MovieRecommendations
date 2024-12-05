@@ -35,7 +35,7 @@ public class MemberController {
     private final MovieDirectorRepository movieDirectorRepository;
     private final MovieGenreRepository movieGenreRepository;
 
-    // 사용자별 리뷰, 영화 정보, 설문조사 정보 조회 API
+    // ‘특정 사용자’의 모든 정보 조회(회원/설문조사/리뷰/영화정보/감독/배우/장르)
     @GetMapping(value="/user/{memberId}", produces = "application/json")
     public UserMovieInfoResponse getUserMovieInfo(@PathVariable Long memberId) {
         // 사용자 정보 조회
@@ -92,6 +92,7 @@ public class MemberController {
         }
     }
 
+    // ‘전체 사용자’의 모든 정보 조회(회원/설문조사/리뷰/영화정보/감독/배우/장르)
     @GetMapping(value = "/users", produces = "application/json")
     public ResponseEntity<List<UserMovieInfoResponse>> getAllUserMovieInfo() {
         // 모든 사용자 조회

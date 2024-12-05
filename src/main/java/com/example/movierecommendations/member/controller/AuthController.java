@@ -17,7 +17,7 @@ import java.util.Map;
 public class AuthController {
     private final AuthenticationService authenticationService;
 
-    // 리프레쉬 토큰으로 새로운 액세스 토큰 발급
+    // 리프레쉬 토큰으로 새로운 액세스 토큰 발급 요청
     @PostMapping("/refresh-token")
     public ResponseEntity<LoginResponseDTO> refreshAccessToken(@RequestBody Map<String, String> request) {
         String refreshToken = request.get("refreshToken");

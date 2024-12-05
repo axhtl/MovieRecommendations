@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify
 import pandas as pd
 import Hybrid_Recom_Module as HRM
+from transformers import AutoModelForCausalLM, AutoTokenizer
 import json
 from flask_cors import CORS
 
