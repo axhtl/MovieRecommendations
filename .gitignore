@@ -38,6 +38,10 @@ out/
 /.nb-gradle/
 
 ### VS Code ###
-.vscode/
+.vscode/git add .
+
+# .env 파일 무시
 .env
-.properties
+
+# .properties 파일 무시
+*.properties
