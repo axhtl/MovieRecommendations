@@ -13,7 +13,7 @@ const MainPage = () => {
 
   useEffect(() => {
     const fetchMovies = async () => {
-      const accessToken = localStorage.getItem('accessToken');
+      const accessToken = localStorage.getItem('token'); // 저장된 토큰 가져오기
 
       if (!userId || !accessToken) {
         alert('로그인이 필요합니다. 로그인 페이지로 이동합니다.');
@@ -28,11 +28,13 @@ const MainPage = () => {
           },
         });
 
-        if (!response.ok) throw new Error('API 호출 실패');
+        if (!response.ok) {
+          throw new Error('API 호출 실패');
+        }
 
         const data = await response.json();
         setMovies(data.reviewInfos || []); // 영화 데이터 저장
-        setNickname(data.member.nickname || ''); // 사용자 닉네임 저장
+        setNickname(data.member?.nickname || ''); // 사용자 닉네임 저장
       } catch (error) {
         console.error('영화 정보를 불러오는 데 실패했습니다:', error.message);
       } finally {
