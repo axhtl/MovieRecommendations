@@ -22,7 +22,9 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable()) // CSRF 비활성화
                 .authorizeHttpRequests(authorize -> authorize
-//                        .requestMatchers("/member/logout", "/member/password/**", "member/nickname/**", "/member/withdraw/**"
+//                        .requestMatchers("/member/logout", "/member/password/**", "member/nickname/**", "/member/withdraw/**",
+//                                "/member/password/**", "/member/nickname/**", "/member/withdraw/**",
+//                                "/review/**", "/api/movies/**", "/survey/**"
 //                        ).authenticated() // 특정 URL에 대해 인증 필요
                         .requestMatchers("/**").permitAll()
                 )
