@@ -38,13 +38,15 @@
   margin-bottom: 20px; /* 별점 컴포넌트와 버튼 사이의 간격 추가 */
 }
 
-.register-button-container {
-  align-self: flex-end; /* 부모 컨테이너의 오른쪽 끝으로 정렬 */
+.button-container {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px; /* 버튼 간격 추가 */
 }
 
-.register-button {
+.register-button,
+.delete-button {
   padding: 10px 20px;
-  background-color: #333; /* 버튼 배경색 */
   color: #fff;
   border: none;
   border-radius: 5px;
@@ -52,6 +54,18 @@
   transition: background-color 0.3s;
 }
 
+.register-button {
+  background-color: #333; /* 리뷰 없음 버튼 배경색 */
+}
+
 .register-button:hover {
-  background-color: #555; /* 호버 시 색상 변화 */
+  background-color: #555; /* 리뷰 없음 버튼 호버 색상 */
+}
+
+.delete-button {
+  background-color: #333; /* 삭제 버튼 배경색 (붉은색) */
+}
+
+.delete-button:hover {
+  background-color: #555; /* 삭제 버튼 호버 색상 (더 어두운 붉은색) */
 }
