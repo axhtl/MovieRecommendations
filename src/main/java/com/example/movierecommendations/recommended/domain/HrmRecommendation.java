@@ -24,22 +24,14 @@ public class HrmRecommendation {
     @JoinColumn(name = "member_id")
     private Member member;  // 추천 리스트가 속한 회원
 
-    // hybridRecommendations 반환하는 메서드
+    // 통합된 recommendations 필드
     @Getter
     @ElementCollection
-    @CollectionTable(name = "hybrid_recommendation", joinColumns = @JoinColumn(name = "hrm_recommendation_id"))
+    @CollectionTable(name = "recommendations", joinColumns = @JoinColumn(name = "hrm_recommendation_id"))
     @Column(name = "movie_info")
-    private List<String> hybridRecommendations;
-
-    // similarMovies 반환하는 메서드
-    @Getter
-    @ElementCollection
-    @CollectionTable(name = "similar_movies", joinColumns = @JoinColumn(name = "hrm_recommendation_id"))
-    @Column(name = "movie_info")
-    private List<String> similarMovies;
+    private List<String> recommendations;
 
     public Long getMemberId() {
         return this.member != null ? this.member.getMemberId() : null;
     }
-
 }

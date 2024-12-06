@@ -18,4 +18,6 @@ public interface MovieInfoRepository extends JpaRepository<MovieInfo, Long> {
 
     // 리뷰 ID로 MovieInfo 조회
     MovieInfo findByReviewId(Long reviewId);
+
+    void deleteById(Long movieInfoId); // movieInfoId로 MovieInfo 삭제
 }

@@ -12,6 +12,5 @@ import java.util.List;
 public class HrmRecommendationDTO {
 
     private Long memberId;  // 추천 리스트의 회원 ID
-    private List<String> hybridRecommendations;  // 하이브리드 추천 영화 목록
-    private List<String> similarMovies;  // 유사 영화 목록
+    private List<String> recommendations;  // 하이브리드 추천 영화 + 유사 영화 목록 통합
 }

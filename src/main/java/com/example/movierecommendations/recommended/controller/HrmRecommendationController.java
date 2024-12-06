@@ -1,8 +1,8 @@
 package com.example.movierecommendations.recommended.controller;
 
 import com.example.movierecommendations.recommended.domain.HrmRecommendation;
-import com.example.movierecommendations.recommended.service.HrmRecommendationService;
 import com.example.movierecommendations.recommended.dto.HrmRecommendationDTO;
+import com.example.movierecommendations.recommended.service.HrmRecommendationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -28,10 +28,10 @@ public class HrmRecommendationController {
             // 조회한 추천 데이터를 DTO로 변환
             HrmRecommendationDTO hrmRecommendationDTO = new HrmRecommendationDTO(
                     hrmRecommendation.getMemberId(),
-                    hrmRecommendation.getHybridRecommendations(),
-                    hrmRecommendation.getSimilarMovies()
+                    hrmRecommendation.getRecommendations()  // 하나로 통합된 recommendations 필드 사용
             );
 
+            // DTO 객체를 JSON 형식으로 반환
             return ResponseEntity.ok(hrmRecommendationDTO);
         } catch (RuntimeException e) {
             // 예외 처리: 추천 리스트가 없을 경우

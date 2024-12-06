@@ -6,7 +6,6 @@ import com.example.movierecommendations.member.domain.Survey;
 import lombok.Builder;
 import lombok.Getter;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
@@ -24,8 +23,6 @@ public class UserMovieInfoResponse {
     public static class ReviewInfo {
         private Long reviewId;
         private int movieId;
-        private String ranked;
-        private LocalDateTime createdAt;
         private MovieInfo movieInfo;
         private List<String> actors;
         private List<String> directors;

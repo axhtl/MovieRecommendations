@@ -53,36 +53,7 @@ public class AIModelService {
         this.llmRecommendationRepository = llmRecommendationRepository;
     }
 
-    // FastAPI에서 추천 결과를 받아오는 메서드
-//    @Async
-//    public void callHRMModel(UserMovieInfoResponse inputData, Long memberId) {
-//        logger.info("Calling FastAPI HRM model with input data: {}", inputData);
-//
-//        webClient.post()
-//                .uri("/recom-hybrid")
-//                .bodyValue(inputData)
-//                .retrieve()
-//                .onStatus(status -> status.is4xxClientError() || status.is5xxServerError(),
-//                        clientResponse -> Mono.error(new RuntimeException("API error: " + clientResponse.statusCode())))
-//                .bodyToMono(new ParameterizedTypeReference<List<String>>() {
-//                }) // 타입을 명확히 지정
-//                .toFuture()
-//                .thenApply(result -> {
-//                    logger.info("Received HRM recommendations: {}", result);
-//                    // HRM 추천 결과를 Recommendation 테이블에 저장
-//                    saveHRMRecommendationResult(memberId, result);
-//                    return result;
-//                })
-//                .exceptionally(ex -> {
-//                    if (ex instanceof WebClientResponseException) {
-//                        WebClientResponseException webClientEx = (WebClientResponseException) ex;
-//                        logger.error("WebClient Error: {} with response: {}", ex.getMessage(), webClientEx.getResponseBodyAsString());
-//                    } else {
-//                        logger.error("Error calling FastAPI HRM model: {}", ex.getMessage());
-//                    }
-//                    throw new RuntimeException("Error calling FastAPI HRM model", ex);
-//                });
-//    }
+
 
 
     // FastAPI에서 추천 결과를 받아오는 메서드
