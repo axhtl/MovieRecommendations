@@ -1,24 +1,27 @@
 package com.example.movierecommendations.AIMODEL;
 
+
 import com.example.movierecommendations.recommended.domain.HrmRecommendation;
 import com.example.movierecommendations.recommended.domain.LlmRecommendation;
 import com.example.movierecommendations.recommended.repository.HrmRecommendationRepository;
 import com.example.movierecommendations.recommended.repository.LlmRecommendationRepository;
 import com.example.movierecommendations.recommended.service.HrmRecommendationService;
 import com.example.movierecommendations.recommended.service.LlmRecommendationService;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.ParameterizedTypeReference;
+
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
 
+
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
 
 @Service
 public class AIModelService {
@@ -30,6 +33,8 @@ public class AIModelService {
     private final HrmRecommendationService hrmRecommendationService;
     private final HrmRecommendationRepository hrmRecommendationRepository;
     private final LlmRecommendationRepository llmRecommendationRepository;
+
+
 
     // 생성자에서 WebClient.Builder를 주입받아 webClient를 초기화
     public AIModelService(WebClient.Builder webClientBuilder, LlmRecommendationService llmRecommendationService,
@@ -96,6 +101,9 @@ public class AIModelService {
                     saveLLMRecommendationResult(memberId, result);
                 });
     }
+
+
+
 
     // HRM 추천 결과를 저장하는 메서드
     private void saveHRMRecommendationResult(Long memberId, List<String> recommendedMovies) {

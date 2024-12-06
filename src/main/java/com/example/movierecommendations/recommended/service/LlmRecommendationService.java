@@ -1,26 +1,43 @@
 package com.example.movierecommendations.recommended.service;
 
+import com.example.movierecommendations.AIMODEL.AIModelService;
+import com.example.movierecommendations.member.domain.PreferredActor;
+import com.example.movierecommendations.member.domain.PreferredGenre;
+import com.example.movierecommendations.member.domain.Survey;
+import com.example.movierecommendations.member.dto.UserMovieInfoResponse;
+import com.example.movierecommendations.member.repository.PreferredActorRepository;
+import com.example.movierecommendations.member.repository.PreferredGenreRepository;
+import com.example.movierecommendations.member.repository.SurveyRepository;
+import com.example.movierecommendations.member.service.MemberService;
 import com.example.movierecommendations.recommended.domain.LlmRecommendation;
 import com.example.movierecommendations.recommended.dto.LlmRecommendationDTO;
 import com.example.movierecommendations.recommended.repository.LlmRecommendationRepository;
 import com.example.movierecommendations.member.domain.Member;
 import com.example.movierecommendations.member.repository.MemberRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import com.example.movierecommendations.member.domain.MovieInfo;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class LlmRecommendationService {
 
     private final LlmRecommendationRepository llmRecommendationRepository;
     private final MemberRepository memberRepository;
 
-    @Autowired
-    public LlmRecommendationService(LlmRecommendationRepository llmRecommendationRepository, MemberRepository memberRepository) {
-        this.llmRecommendationRepository = llmRecommendationRepository;
-        this.memberRepository = memberRepository;
-    }
+    private final SurveyRepository surveyRepository;
+    private final PreferredGenreRepository preferredGenreRepository;
+    private final PreferredActorRepository preferredActorRepository;
+    //private final AIModelService aiModelService;
+    private final MemberService memberService;
 
     public void saveRecommendationForMember(Long memberId, List<String> recommendedMovies) {
         Member member = memberRepository.findById(memberId)

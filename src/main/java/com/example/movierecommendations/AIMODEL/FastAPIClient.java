@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import org.springframework.core.ParameterizedTypeReference;
 
-@Servicegit add
+@Service
 public class FastAPIClient {
 
     private final WebClient webClient;

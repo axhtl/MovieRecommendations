@@ -39,11 +39,27 @@ class LLMRequest(BaseModel):
 @app.post("/api/ai/predict")
 async def hrm_ai_recommendation(request: RecommendationRequest):
     # 요청에서 데이터 받아오기
-    user_input = request.user_input
-    user_behavior_data = request.user_behavior_data
-    movie_name = request.movie_name
+    # 필요한 값들 추출
+    gender = request.get("gender")
+    age = request.get("age")
+    preferred_genres = request.get("preferredGenres")
+    preferred_actors = request.get("preferredActors")
+    movie_name = request.get("target_movie")
 
-    if not user_input or not user_behavior_data or not movie_name:
+    # 새 JSON 형식으로 묶기
+    result = {
+        "gender": gender,
+        "age": age,
+        "preferredGenres": preferred_genres,
+        "preferredActors": preferred_actors
+    }
+
+    # JSON 형식으로 변환 (optional, 출력)
+    user_input = json.dumps(result, ensure_ascii=False, indent=4)
+
+    user_behavior_data = None
+
+    if not user_input  or not movie_name:
         raise HTTPException(status_code=400, detail="필수 데이터가 누락되었습니다. user_input, user_behavior_data, movie_name이 필요합니다.")
 
     try:
@@ -121,9 +137,9 @@ if __name__ == "__main__":
 
 
    """
-   연동 구조 요약:
-    - Flask는 Python 코드에서 API를 제공하고, Spring Boot는 Flask API를 호출하여 데이터를 받아옵니다.
-    - **AIModelService.java**에서 Flask 서버를 실행하지 않고, 외부 프로세스로 Python 스크립트를 호출합니다.
-    - Spring Boot는 Flask로부터 JSON 응답을 받아서 처리하고, **AIController**에서 이를 클라이언트에 전달합니다.
-    - Flask 서버는 Spring Boot 내에서 외부 프로세스로 실행되며, 포트 충돌을 피하기 위해 Spring Boot가 모든 HTTP 요청을 처리합니다.
+  연동 구조 요약:
+   - FastAPI는 Python 코드에서 API를 제공하고, Spring Boot는 FastAPI API를 호출하여 데이터를 받아옵니다.
+   - **AIModelService.java**에서는 FastAPI 서버를 실행하지 않고, 외부 프로세스로 Python 스크립트를 호출합니다.
+   - Spring Boot는 FastAPI로부터 JSON 응답을 받아 처리하고, **AIController**에서 이를 클라이언트에 전달합니다.
+   - FastAPI 서버는 Spring Boot 내에서 외부 프로세스로 실행되며, 포트 충돌을 피하기 위해 Spring Boot가 모든 HTTP 요청을 처리합니다.
    """

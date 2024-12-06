@@ -8,7 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/recommendations")
+@RequestMapping("/ai")
 public class HrmRecommendationController {
 
     private final HrmRecommendationService hrmRecommendationService;
@@ -19,7 +19,7 @@ public class HrmRecommendationController {
     }
 
     // 특정 회원의 추천 리스트를 조회하는 엔드포인트
-    @GetMapping("/{memberId}")
+    @GetMapping(value = "/recommend/{memberId}", produces = "application/json")
     public ResponseEntity<HrmRecommendationDTO> getRecommendationByMemberId(@PathVariable Long memberId) {
         try {
             // 서비스 계층에서 추천 리스트를 조회
