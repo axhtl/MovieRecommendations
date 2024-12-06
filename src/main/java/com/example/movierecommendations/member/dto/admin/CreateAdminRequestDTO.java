@@ -27,7 +27,7 @@ public class CreateAdminRequestDTO {
                 .nickname(nickname)
                 .role(Role.ADMIN)
                 .memberStatus(MemberStatus.ACTIVE)
-                .createdAt(LocalDateTime.now())
+//                .createdAt(LocalDateTime.now())
                 .build();
     }
 }

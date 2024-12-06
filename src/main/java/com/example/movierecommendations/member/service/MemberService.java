@@ -44,7 +44,7 @@ public class MemberService {
                         .reviewId(review.getReviewId())
                         .movieId(review.getMovieId())
                         .ranked(review.getRanked())
-                        .createdAt(review.getCreatedAt())
+//                        .createdAt(review.getCreatedAt())
                         .build())
                 .collect(Collectors.toList());
 
@@ -202,7 +202,7 @@ public class MemberService {
         // refreshToken을 NULL로 설정하고, 회원 상태를 WITHDRAWN으로 변경
         member.updateRefreshToken(null); // refreshToken을 null로 설정
         member.updateMemberStatus(MemberStatus.WITHDRAWN); // 회원 상태를 WITHDRAWN으로 변경
-        member.updateDeletedAt(LocalDateTime.now());
+//        member.updateDeletedAt(LocalDateTime.now());
     }
 
     private void validateCreateMemberRequest(CreateMemberRequestDTO request) {
