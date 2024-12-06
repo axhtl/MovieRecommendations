@@ -1,6 +1,7 @@
 package com.example.movierecommendations.AIMODEL;
 
 
+import com.example.movierecommendations.member.dto.UserMovieInfoResponse;
 import com.example.movierecommendations.recommended.domain.HrmRecommendation;
 import com.example.movierecommendations.recommended.domain.LlmRecommendation;
 import com.example.movierecommendations.recommended.repository.HrmRecommendationRepository;
@@ -41,7 +42,7 @@ public class AIModelService {
                           HrmRecommendationService hrmRecommendationService,
                           HrmRecommendationRepository hrmRecommendationRepository,
                           LlmRecommendationRepository llmRecommendationRepository) {
-        this.webClient = webClientBuilder.baseUrl("http://127.0.0.1:8080").build(); // WebClient 생성
+        this.webClient = webClientBuilder.baseUrl("http://127.0.0.1:8086").build(); // WebClient 생성
         this.llmRecommendationService = llmRecommendationService;
         this.hrmRecommendationService = hrmRecommendationService;
         this.hrmRecommendationRepository = hrmRecommendationRepository;
@@ -50,11 +51,11 @@ public class AIModelService {
 
     // FastAPI에서 추천 결과를 받아오는 메서드
     @Async
-    public void callHRMModel(Map<String, Object> inputData, Long memberId) {
+    public void callHRMModel(UserMovieInfoResponse inputData, Long memberId) {
         logger.info("Calling FastAPI HRM model with input data: {}", inputData);
 
         webClient.post()
-                .uri("/api/ai/predict")
+                .uri("/recom-hybrid")
                 .bodyValue(inputData)
                 .retrieve()
                 .onStatus(status -> status.is4xxClientError() || status.is5xxServerError(),
@@ -83,7 +84,7 @@ public class AIModelService {
 
     // FastAPI에서 LLM 추천 결과를 받아오는 메서드
     @Async
-    public void callLLMModel(Map<String, Object> inputData, Long memberId) {
+    public void callLLMModel(UserMovieInfoResponse inputData, Long memberId) {
         logger.info("Calling FastAPI LLM model with input data: {}", inputData);
 
         webClient.post()
