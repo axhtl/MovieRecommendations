@@ -8,4 +8,5 @@ import java.util.List;
 
 public interface MovieGenreRepository extends JpaRepository<MovieGenre, Long> {
     List<MovieGenre> findByMovieInfo(MovieInfo movieInfo);
+    void deleteByMovieInfo_MovieInfoId(Long movieInfoId);  // MovieInfo의 movieInfoId를 기준으로 삭제
 }
