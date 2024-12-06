@@ -216,4 +216,15 @@ public class MemberService {
             throw new IllegalArgumentException("닉네임은 최소 2자 이상이어야 합니다.");
         }
     }
+
+    public List<String> getUserMovieTitles(Long memberId) {
+        // 사용자별 영화 정보 가져오기
+        UserMovieInfoResponse response = getUserMovieInfo(memberId);
+
+        // reviewInfos에서 movieInfo.title을 추출하여 리스트로 반환
+        return response.getReviewInfos().stream()
+                .map(UserMovieInfoResponse.ReviewInfo::getMovieInfo) // ReviewInfo에서 MovieInfo 추출
+                .map(MovieInfo::getTitle)      // MovieInfo에서 title 추출
+                .collect(Collectors.toList());
+    }
 }

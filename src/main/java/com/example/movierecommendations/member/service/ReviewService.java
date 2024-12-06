@@ -167,12 +167,19 @@ public class ReviewService {
 
     @Transactional
     public void deleteReviewById(Long reviewId) {
-        // 존재 여부 확인 후 삭제
-        reviewRepository.findById(reviewId)
-                .orElseThrow(() -> new RuntimeException("Review not found"));
 
-        // MovieInfo 테이블에서 reviewId로 삭제
-        movieInfoRepository.deleteByReviewId(reviewId);
+        // 리뷰 ID로 MovieInfo 조회
+        MovieInfo movieInfo = movieInfoRepository.findByReviewId(reviewId);
+
+        Long movieInfoId = movieInfo.getMovieInfoId();
+
+        // 영화에 관련된 MovieActor, MovieDirector, MovieGenre를 먼저 삭제
+        movieActorRepository.deleteByMovieInfo_MovieInfoId(movieInfoId);
+        movieDirectorRepository.deleteByMovieInfo_MovieInfoId(movieInfoId);
+        movieGenreRepository.deleteByMovieInfo_MovieInfoId(movieInfoId);
+
+        // 마지막으로 MovieInfo를 삭제
+        movieInfoRepository.deleteById(movieInfoId);
 
         // Review 테이블에서 삭제
         reviewRepository.deleteById(reviewId);

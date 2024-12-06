@@ -35,6 +35,14 @@ public class MemberController {
     private final MovieDirectorRepository movieDirectorRepository;
     private final MovieGenreRepository movieGenreRepository;
 
+    // 특정 사용자의 영화 제목 리스트 반환 API
+    @GetMapping("/{memberId}/movie-titles")
+    public ResponseEntity<List<String>> getUserMovieTitles(@PathVariable Long memberId) {
+        // Service 호출을 통해 제목 리스트 가져오기
+        List<String> titles = memberService.getUserMovieTitles(memberId);
+        return ResponseEntity.ok(titles); // 200 OK와 함께 제목 리스트 반환
+    }
+
     // 특정 사용자의 모든 정보 조회 API
     @GetMapping(value = "/user/{memberId}", produces = "application/json")
     public UserMovieInfoResponse getUserMovieInfo(@PathVariable Long memberId) {
