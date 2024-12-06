@@ -3,26 +3,23 @@ package com.example.movierecommendations.AIMODEL;
 import com.example.movierecommendations.member.dto.UserMovieInfoResponse;
 import com.example.movierecommendations.member.service.MemberService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 @RestController
 @RequestMapping("/api/ai")  // 엔드포인트 URL
 public class AIController {
 
-    private final FastAPIClient fastAPIClient;
+    private final AIModelService aiModelService;  // AIModelService를 주입
     private final MemberService memberService;
 
-    // FastAPIClient 주입
+    // AIModelService 및 MemberService 주입
     @Autowired
-    public AIController(FastAPIClient fastAPIClient, MemberService memberService) {
-        this.fastAPIClient = fastAPIClient;
+    public AIController(AIModelService aiModelService, MemberService memberService) {
+        this.aiModelService = aiModelService;
         this.memberService = memberService;
     }
 
@@ -31,12 +28,12 @@ public class AIController {
     public CompletableFuture<ResponseEntity<List<String>>> HRMpredict(@PathVariable Long memberId) {
         // 사용자별 영화 정보 가져오기
         UserMovieInfoResponse inputData = memberService.getUserMovieInfo(memberId);
-        // FastAPI의 /predict 엔드포인트로 요청을 보냄
-        return fastAPIClient.callFastAPIModel("/recom-hybrid",  inputData)
-                .thenApply(ResponseEntity::ok)  // 응답을 OK로 감싸서 반환
-                .exceptionally(ex -> {
-                    return ResponseEntity.status(500).body(List.of("Error occurred while calling the AI model: " + ex.getMessage()));
-                });
+
+        // HRM 모델 호출 (AIModelService의 callHRMModel 사용)
+        aiModelService.callHRMModel(inputData, memberId);
+
+        // 즉시 응답을 반환 (비동기 방식이므로 결과는 나중에 처리됨)
+        return CompletableFuture.supplyAsync(() -> ResponseEntity.ok(List.of("HRM recommendation initiated")));
     }
 
     // LLM 모델을 호출하는 메서드
@@ -44,12 +41,11 @@ public class AIController {
     public CompletableFuture<ResponseEntity<List<String>>> LLMpredict(@PathVariable Long memberId) {
         // 사용자별 영화 정보 가져오기
         UserMovieInfoResponse inputData = memberService.getUserMovieInfo(memberId);
-        // FastAPI의 /predict2 엔드포인트로 요청을 보냄
-        return fastAPIClient.callFastAPIModel("/api/ai/predict/llm", inputData)
-                .thenApply(ResponseEntity::ok)  // 응답을 OK로 감싸서 반환
-                .exceptionally(ex -> {
-                    return ResponseEntity.status(500).body(List.of("Error occurred while calling the LLM model: " + ex.getMessage()));
-                });
-    }
 
+        // LLM 모델 호출 (AIModelService의 callLLMModel 사용)
+        aiModelService.callLLMModel(inputData, memberId);
+
+        // 즉시 응답을 반환 (비동기 방식이므로 결과는 나중에 처리됨)
+        return CompletableFuture.supplyAsync(() -> ResponseEntity.ok(List.of("LLM recommendation initiated")));
+    }
 }
