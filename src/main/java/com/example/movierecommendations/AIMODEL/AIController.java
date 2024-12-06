@@ -29,7 +29,7 @@ public class AIController {
         // 사용자별 영화 정보 가져오기
         UserMovieInfoResponse inputData = memberService.getUserMovieInfo(memberId);
         // FastAPI의 /predict 엔드포인트로 요청을 보냄
-        return fastAPIClient.callFastAPIModel("/api/ai/predict", (Map<String, Object>) inputData)
+        return fastAPIClient.callFastAPIModel("/recom-hybrid",  inputData)
                 .thenApply(ResponseEntity::ok)  // 응답을 OK로 감싸서 반환
                 .exceptionally(ex -> {
                     return ResponseEntity.status(500).body(List.of("Error occurred while calling the AI model: " + ex.getMessage()));
@@ -38,7 +38,9 @@ public class AIController {
 
     // LLM 모델을 호출하는 메서드
     @PostMapping("/predict2/{memberId}")
-    public CompletableFuture<ResponseEntity<List<String>>> LLMpredict(@PathVariable Long memberId, @RequestBody Map<String, Object> inputData) {
+    public CompletableFuture<ResponseEntity<List<String>>> LLMpredict(@PathVariable Long memberId) {
+        // 사용자별 영화 정보 가져오기
+        UserMovieInfoResponse inputData = memberService.getUserMovieInfo(memberId);
         // FastAPI의 /predict2 엔드포인트로 요청을 보냄
         return fastAPIClient.callFastAPIModel("/api/ai/predict/llm", inputData)
                 .thenApply(ResponseEntity::ok)  // 응답을 OK로 감싸서 반환

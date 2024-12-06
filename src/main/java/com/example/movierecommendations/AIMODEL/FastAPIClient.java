@@ -1,5 +1,6 @@
 package com.example.movierecommendations.AIMODEL;
 
+import com.example.movierecommendations.member.dto.UserMovieInfoResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -19,12 +20,12 @@ public class FastAPIClient {
     @Autowired
     public FastAPIClient(WebClient.Builder webClientBuilder) {
         // FastAPI 서버 URL 설정
-        this.webClient = webClientBuilder.baseUrl("http://localhost:8080")  // FastAPI 서버 주소
+        this.webClient = webClientBuilder.baseUrl("http://localhost:8086")  // FastAPI 서버 주소
                 .build();
     }
 
     // FastAPI 모델 호출 메서드
-    public CompletableFuture<List<String>> callFastAPIModel(String endpoint, Map<String, Object> requestBody) {
+    public CompletableFuture<List<String>> callFastAPIModel(String endpoint, UserMovieInfoResponse requestBody) {
         return webClient.post()
                 .uri(endpoint)  // FastAPI의 엔드포인트
                 .contentType(MediaType.APPLICATION_JSON)  // JSON 형식으로 전송
