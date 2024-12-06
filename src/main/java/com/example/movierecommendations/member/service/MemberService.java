@@ -38,6 +38,16 @@ public class MemberService {
         // 사용자 ID로 모든 리뷰 조회
         List<Review> reviews = reviewRepository.findByMember_MemberId(memberId);
 
+        // 리뷰를 ReviewDTO로 변환
+        List<ReviewDTO> reviewDTOs = reviews.stream()
+                .map(review -> ReviewDTO.builder()
+                        .reviewId(review.getReviewId())
+                        .movieId(review.getMovieId())
+                        .ranked(review.getRanked())
+                        .createdAt(review.getCreatedAt())
+                        .build())
+                .collect(Collectors.toList());
+
         // 선호 장르 및 선호 배우 정보 조회
         List<String> preferredGenres = member.getPreferredGenres()
                 .stream()
@@ -71,6 +81,7 @@ public class MemberService {
                 .survey(survey)
                 .preferredGenres(preferredGenres) // 선호 장르
                 .preferredActors(preferredActors) // 선호 배우
+                .reviews(reviewDTOs)
                 .reviewInfos(reviewInfos) // 리뷰 정보
                 .build();
     }
