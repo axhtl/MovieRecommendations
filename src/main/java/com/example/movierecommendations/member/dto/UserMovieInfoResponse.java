@@ -24,8 +24,6 @@ public class UserMovieInfoResponse {
     public static class ReviewInfo {
         private Long reviewId;
         private int movieId;
-        private String ranked;
-        private LocalDateTime createdAt;
         private MovieInfo movieInfo;
         private List<String> actors;
         private List<String> directors;
