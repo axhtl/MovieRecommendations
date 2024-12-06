@@ -1,38 +1,44 @@
 package com.example.movierecommendations.AIMODEL;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
-import org.springframework.beans.factory.annotation.Autowired;
-
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 @RestController
-@RequestMapping("/api/ai")
+@RequestMapping("/api/ai")  // 엔드포인트 URL
 public class AIController {
 
-    private final AIModelService aiModelService;
+    private final FastAPIClient fastAPIClient;
 
+    // FastAPIClient 주입
     @Autowired
-    public AIController(AIModelService aiModelService) {
-        this.aiModelService = aiModelService;
+    public AIController(FastAPIClient fastAPIClient) {
+        this.fastAPIClient = fastAPIClient;
     }
 
-    // 설문조사 결과를 AI 모델에 보내어 추천 결과를 받음 (기존 HRM 모델)
+    // 기존 HRM 모델을 호출하는 메서드
     @PostMapping("/predict/{memberId}")
-    public CompletableFuture<ResponseEntity<List<String>>> HRMpredict(@PathVariable Long memberId, @RequestBody Map<String, Object> inputData) throws IOException {
-        return aiModelService.callHRMModel(inputData, memberId)
-                .thenApply(ResponseEntity::ok)
-                .exceptionally(ex -> ResponseEntity.status(500).body(List.of("Error occurred while calling the AI model: " + ex.getMessage())));
+    public CompletableFuture<ResponseEntity<List<String>>> HRMpredict(@PathVariable Long memberId, @RequestBody Map<String, Object> inputData) {
+        // FastAPI의 /predict 엔드포인트로 요청을 보냄
+        return fastAPIClient.callFastAPIModel("/api/ai/predict", inputData)
+                .thenApply(ResponseEntity::ok)  // 응답을 OK로 감싸서 반환
+                .exceptionally(ex -> {
+                    return ResponseEntity.status(500).body(List.of("Error occurred while calling the AI model: " + ex.getMessage()));
+                });
     }
 
-    // 새로운 LLM 모델을 호출하여 추천 결과를 받음 (새로운 메서드 predict2)
+    // LLM 모델을 호출하는 메서드
     @PostMapping("/predict2/{memberId}")
-    public CompletableFuture<ResponseEntity<List<String>>> LLMpredict(@PathVariable Long memberId, @RequestBody Map<String, Object> inputData) throws IOException {
-        return aiModelService.callLLMModel(inputData, memberId)
-                .thenApply(ResponseEntity::ok)
-                .exceptionally(ex -> ResponseEntity.status(500).body(List.of("Error occurred while calling the LLM model: " + ex.getMessage())));
+    public CompletableFuture<ResponseEntity<List<String>>> LLMpredict(@PathVariable Long memberId, @RequestBody Map<String, Object> inputData) {
+        // FastAPI의 /predict2 엔드포인트로 요청을 보냄
+        return fastAPIClient.callFastAPIModel("/api/ai/predict/llm", inputData)
+                .thenApply(ResponseEntity::ok)  // 응답을 OK로 감싸서 반환
+                .exceptionally(ex -> {
+                    return ResponseEntity.status(500).body(List.of("Error occurred while calling the LLM model: " + ex.getMessage()));
+                });
     }
 }

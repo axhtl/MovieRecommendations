@@ -1,6 +1,5 @@
 package com.example.movierecommendations.member.service;
 
-import com.example.movierecommendations.AIMODEL.AIModelService;
 import com.example.movierecommendations.member.domain.Member;
 import com.example.movierecommendations.member.domain.PreferredActor;
 import com.example.movierecommendations.member.domain.PreferredGenre;
@@ -16,9 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -28,10 +25,9 @@ public class SurveyService {
     private final PreferredGenreRepository preferredGenreRepository;
     private final PreferredActorRepository preferredActorRepository;
     private final MemberRepository memberRepository;
-    private final AIModelService aiModelService;  // AIModelService를 주입
 
     @Transactional
-    public Long saveSurvey(Long memberId, CreateSurveyRequestDTO request) throws IOException {
+    public Long saveSurvey(Long memberId, CreateSurveyRequestDTO request) {
         // 입력값 검증 - NULL 체크
         validateCreateSurveyRequest(request);
 
@@ -56,21 +52,8 @@ public class SurveyService {
         List<PreferredActor> preferredActor = request.toPreferredActor(member);
         preferredActorRepository.saveAll(preferredActor);
 
-        // AI 추천 요청
-        Map<String, Object> surveyData = Map.of(
-                "gender", survey.getGender(),
-                "age", survey.getAge(),
-                "preferredGenres", preferredGenres.stream().map(PreferredGenre::getGenre).collect(Collectors.toList()),
-                "preferredActors", preferredActor.stream().map(PreferredActor::getActor).collect(Collectors.toList())
-        );
-
-        // AI 모델에 추천 요청을 보내고 결과를 저장
-        aiModelService.callHRMModel(surveyData, memberId);
-
-
         return survey.getSurveyId();
     }
-
 
     private void validateCreateSurveyRequest(CreateSurveyRequestDTO request) {
         if (request.getGender() == null) {

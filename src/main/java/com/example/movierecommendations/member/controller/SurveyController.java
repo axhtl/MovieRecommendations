@@ -10,9 +10,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
-import java.util.Map;
-
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/survey")
@@ -22,10 +19,8 @@ public class SurveyController {
 
     // 설문조사 등록
     @PostMapping("/{memberId}")
-    public ResponseEntity<SaveResponseDTO> saveSurvey(@PathVariable Long memberId, @RequestBody CreateSurveyRequestDTO request) throws IOException {
+    public ResponseEntity<SaveResponseDTO> saveSurvey(@PathVariable Long memberId, @RequestBody CreateSurveyRequestDTO request) {
         Long surveyId = surveyService.saveSurvey(memberId, request);
-
-
         return ResponseEntity.ok(new SaveResponseDTO(
                 surveyId, HttpStatus.OK.value(), "설문조사가 정상적으로 등록되었습니다."
         ));

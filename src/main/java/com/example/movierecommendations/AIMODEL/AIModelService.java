@@ -1,128 +1,119 @@
 package com.example.movierecommendations.AIMODEL;
 
+import com.example.movierecommendations.recommended.domain.HrmRecommendation;
+import com.example.movierecommendations.recommended.domain.LlmRecommendation;
+import com.example.movierecommendations.recommended.repository.HrmRecommendationRepository;
+import com.example.movierecommendations.recommended.repository.LlmRecommendationRepository;
 import com.example.movierecommendations.recommended.service.HrmRecommendationService;
 import com.example.movierecommendations.recommended.service.LlmRecommendationService;
-import com.example.movierecommendations.member.domain.Member;
-import com.example.movierecommendations.member.repository.MemberRepository;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
+import reactor.core.publisher.Mono;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 @Service
-@RequiredArgsConstructor
 public class AIModelService {
 
     private static final Logger logger = LoggerFactory.getLogger(AIModelService.class);
 
+    private final WebClient webClient;
     private final LlmRecommendationService llmRecommendationService;
     private final HrmRecommendationService hrmRecommendationService;
-    private final MemberRepository memberRepository;
+    private final HrmRecommendationRepository hrmRecommendationRepository;
+    private final LlmRecommendationRepository llmRecommendationRepository;
 
-    // 비동기적으로 Python AI 모델을 호출하여 추천 결과를 가져오는 메서드
-    @Async
-    public CompletableFuture<List<String>> callHRMModel(Map<String, Object> inputData, Long memberId) throws IOException {
-        logger.info("Calling Python AI model with input data: {}, for memberId: {}", inputData, memberId);
-
-        String jsonData = new ObjectMapper().writeValueAsString(inputData);
-        ProcessBuilder processBuilder = new ProcessBuilder("python3", "recomsystem/hrm.py", jsonData);
-        processBuilder.redirectErrorStream(true);
-
-        Process process = processBuilder.start();
-        BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-        StringBuilder result = new StringBuilder();
-        String line;
-
-        while ((line = reader.readLine()) != null) {
-            result.append(line);
-        }
-
-        try {
-            int exitCode = process.waitFor();
-            if (exitCode != 0) {
-                throw new RuntimeException("Python AI model execution failed with exit code: " + exitCode);
-            }
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            logger.error("Error while executing Python model: {}", e.getMessage());
-            throw new RuntimeException("Error while executing Python model", e);
-        }
-
-        // 결과가 정상적으로 오면 추천 결과를 반환
-        List<String> recommendedMovies = parseHRMRecommendationResult(result.toString());
-
-        // 추천 결과를 Recommendation 테이블에 저장
-        saveHRMRecommendationResult(memberId, recommendedMovies);
-
-        return CompletableFuture.completedFuture(recommendedMovies);
+    // 생성자에서 WebClient.Builder를 주입받아 webClient를 초기화
+    public AIModelService(WebClient.Builder webClientBuilder, LlmRecommendationService llmRecommendationService,
+                          HrmRecommendationService hrmRecommendationService,
+                          HrmRecommendationRepository hrmRecommendationRepository,
+                          LlmRecommendationRepository llmRecommendationRepository) {
+        this.webClient = webClientBuilder.baseUrl("http://127.0.0.1:8080").build(); // WebClient 생성
+        this.llmRecommendationService = llmRecommendationService;
+        this.hrmRecommendationService = hrmRecommendationService;
+        this.hrmRecommendationRepository = hrmRecommendationRepository;
+        this.llmRecommendationRepository = llmRecommendationRepository;
     }
 
-    // 비동기적으로 Python AI 모델을 호출하여 추천 결과를 가져오는 메서드
+    // FastAPI에서 추천 결과를 받아오는 메서드
     @Async
-    public CompletableFuture<List<String>> callLLMModel(Map<String, Object> inputData, Long memberId) throws IOException {
-        String userPrompt = (String) inputData.get("user_prompt");
-        if (userPrompt == null || userPrompt.isEmpty()) {
-            throw new IllegalArgumentException("user_prompt는 필수입니다.");
-        }
+    public void callHRMModel(Map<String, Object> inputData, Long memberId) {
+        logger.info("Calling FastAPI HRM model with input data: {}", inputData);
 
-        ProcessBuilder processBuilder = new ProcessBuilder("python3", "recomsystem/llm.py", userPrompt);
-        processBuilder.redirectErrorStream(true);
-
-        Process process = processBuilder.start();
-        BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-        StringBuilder result = new StringBuilder();
-        String line;
-
-        while ((line = reader.readLine()) != null) {
-            result.append(line);
-        }
-
-        try {
-            int exitCode = process.waitFor();
-            if (exitCode != 0) {
-                throw new RuntimeException("Python 스크립트 실행 실패, 종료 코드: " + exitCode);
-            }
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            logger.error("Python 스크립트 실행 중 오류 발생: {}", e.getMessage());
-            throw new RuntimeException("Python 스크립트 실행 중 오류 발생", e);
-        }
-
-        List<String> recommendedMovies = parseLLMRecommendationResult(result.toString());
-
-        saveLLMRecommendationResult(memberId, recommendedMovies);
-
-        return CompletableFuture.completedFuture(recommendedMovies);
+        webClient.post()
+                .uri("/api/ai/predict")
+                .bodyValue(inputData)
+                .retrieve()
+                .onStatus(status -> status.is4xxClientError() || status.is5xxServerError(),
+                        clientResponse -> Mono.error(new RuntimeException("API error: " + clientResponse.statusCode())))
+                .bodyToMono(new ParameterizedTypeReference<List<String>>() {
+                }) // 타입을 명확히 지정
+                .toFuture()
+                .thenApply(result -> {
+                    logger.info("Received HRM recommendations: {}", result);
+                    // HRM 추천 결과를 Recommendation 테이블에 저장
+                    saveHRMRecommendationResult(memberId, result);
+                    return result;
+                })
+                .exceptionally(ex -> {
+                    if (ex instanceof WebClientResponseException) {
+                        WebClientResponseException webClientEx = (WebClientResponseException) ex;
+                        logger.error("WebClient Error: {} with response: {}", ex.getMessage(), webClientEx.getResponseBodyAsString());
+                    } else {
+                        logger.error("Error calling FastAPI HRM model: {}", ex.getMessage());
+                    }
+                    throw new RuntimeException("Error calling FastAPI HRM model", ex);
+                });
     }
 
-    // HRM 모델의 추천 결과를 파싱하는 메서드
-    private List<String> parseHRMRecommendationResult(String result) {
-        return List.of(result.split(","));
+
+
+    // FastAPI에서 LLM 추천 결과를 받아오는 메서드
+    @Async
+    public void callLLMModel(Map<String, Object> inputData, Long memberId) {
+        logger.info("Calling FastAPI LLM model with input data: {}", inputData);
+
+        webClient.post()
+                .uri("/api/ai/predict/llm")
+                .bodyValue(inputData)
+                .retrieve()
+                .onStatus(status -> status.is4xxClientError() || status.is5xxServerError(),
+                        clientResponse -> Mono.error(new RuntimeException("API error: " + clientResponse.statusCode())))
+                .bodyToMono(new ParameterizedTypeReference<List<String>>() {}) // 타입을 명확히 지정
+                .doOnTerminate(() -> logger.info("Finished LLM recommendation call"))
+                .doOnError(ex -> logger.error("Error calling FastAPI LLM model: {}", ex.getMessage()))
+                .subscribe(result -> {
+                    logger.info("Received LLM recommendations: {}", result);
+                    // LLM 추천 결과를 Recommendation 테이블에 저장
+                    saveLLMRecommendationResult(memberId, result);
+                });
     }
 
     // HRM 추천 결과를 저장하는 메서드
     private void saveHRMRecommendationResult(Long memberId, List<String> recommendedMovies) {
-        // HRM 추천 결과를 저장하는 로직 (HRMRecommendation 엔티티)
         hrmRecommendationService.saveRecommendationForMember(memberId, recommendedMovies);
-    }
-
-    // LLM 모델의 추천 결과를 파싱하는 메서드
-    private List<String> parseLLMRecommendationResult(String result) {
-        return List.of(result.split(","));
     }
 
     // LLM 추천 결과를 저장하는 메서드
     private void saveLLMRecommendationResult(Long memberId, List<String> recommendedMovies) {
-        // LLM 추천 결과를 저장하는 로직 (LlmRecommendation 엔티티)
         llmRecommendationService.saveRecommendationForMember(memberId, recommendedMovies);
+    }
+
+    // memberId를 기준으로 HRM 추천 결과를 반환하는 메서드
+    public Optional<HrmRecommendation> getHRMRecommendationByMemberId(Long memberId) {
+        return hrmRecommendationRepository.findByMemberMemberId(memberId);
+    }
+
+    // memberId를 기준으로 LLM 추천 결과를 반환하는 메서드
+    public Optional<LlmRecommendation> getLLMRecommendationByMemberId(Long memberId) {
+        return llmRecommendationRepository.findByMember_MemberId(memberId);
     }
 }
