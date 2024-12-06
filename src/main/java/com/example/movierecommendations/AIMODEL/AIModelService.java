@@ -9,8 +9,10 @@ import com.example.movierecommendations.recommended.repository.LlmRecommendation
 import com.example.movierecommendations.recommended.service.HrmRecommendationService;
 import com.example.movierecommendations.recommended.service.LlmRecommendationService;
 
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 
 import org.springframework.scheduling.annotation.Async;
@@ -25,6 +27,7 @@ import java.util.Map;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class AIModelService {
 
     private static final Logger logger = LoggerFactory.getLogger(AIModelService.class);
@@ -38,6 +41,7 @@ public class AIModelService {
 
 
     // 생성자에서 WebClient.Builder를 주입받아 webClient를 초기화
+    @Autowired
     public AIModelService(WebClient.Builder webClientBuilder, LlmRecommendationService llmRecommendationService,
                           HrmRecommendationService hrmRecommendationService,
                           HrmRecommendationRepository hrmRecommendationRepository,
