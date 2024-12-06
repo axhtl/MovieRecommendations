@@ -2,14 +2,14 @@ package com.example.movierecommendations.AIMODEL;
 
 import com.example.movierecommendations.member.dto.UserMovieInfoResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.CompletableFuture;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
+
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 @Service
 public class FastAPIClient {

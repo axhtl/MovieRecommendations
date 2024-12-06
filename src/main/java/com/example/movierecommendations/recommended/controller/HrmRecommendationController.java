@@ -1,8 +1,8 @@
 package com.example.movierecommendations.recommended.controller;
 
 import com.example.movierecommendations.recommended.domain.HrmRecommendation;
-import com.example.movierecommendations.recommended.service.HrmRecommendationService;
 import com.example.movierecommendations.recommended.dto.HrmRecommendationDTO;
+import com.example.movierecommendations.recommended.service.HrmRecommendationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

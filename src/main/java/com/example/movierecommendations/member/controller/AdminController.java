@@ -3,7 +3,6 @@ package com.example.movierecommendations.member.controller;
 import com.example.movierecommendations.member.dto.SaveResponseDTO;
 import com.example.movierecommendations.member.dto.admin.CreateAdminRequestDTO;
 import com.example.movierecommendations.member.service.AdminService;
-import com.example.movierecommendations.member.service.AuthenticationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

@@ -1,14 +1,13 @@
 package com.example.movierecommendations.recommended.service;
 
+import com.example.movierecommendations.member.domain.Member;
+import com.example.movierecommendations.member.repository.MemberRepository;
 import com.example.movierecommendations.recommended.domain.HrmRecommendation;
 import com.example.movierecommendations.recommended.dto.HrmRecommendationDTO;
 import com.example.movierecommendations.recommended.repository.HrmRecommendationRepository;
-import com.example.movierecommendations.member.domain.Member;
-import com.example.movierecommendations.member.repository.MemberRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
 import java.util.List;
 
 @Service

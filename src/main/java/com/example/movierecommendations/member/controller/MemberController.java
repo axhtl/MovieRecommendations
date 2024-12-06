@@ -1,23 +1,18 @@
 package com.example.movierecommendations.member.controller;
 
-import com.example.movierecommendations.member.domain.*;
 import com.example.movierecommendations.member.dto.*;
 import com.example.movierecommendations.member.repository.*;
 import com.example.movierecommendations.member.service.AuthenticationService;
 import com.example.movierecommendations.member.service.MemberService;
 import com.example.movierecommendations.security.JwtTokenProvider;
-import lombok.Builder;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor

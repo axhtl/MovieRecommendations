@@ -3,11 +3,9 @@ package com.example.movierecommendations.member.dto;
 import com.example.movierecommendations.member.domain.Member;
 import com.example.movierecommendations.member.domain.MovieInfo;
 import com.example.movierecommendations.member.domain.Survey;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
