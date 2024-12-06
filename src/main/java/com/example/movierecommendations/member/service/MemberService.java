@@ -1,10 +1,8 @@
 package com.example.movierecommendations.member.service;
 
-import com.example.movierecommendations.member.domain.Member;
-import com.example.movierecommendations.member.dto.CreateMemberRequestDTO;
-import com.example.movierecommendations.member.dto.NicknameUpdateRequestDTO;
-import com.example.movierecommendations.member.dto.PasswordUpdateRequestDTO;
-import com.example.movierecommendations.member.repository.MemberRepository;
+import com.example.movierecommendations.member.domain.*;
+import com.example.movierecommendations.member.dto.*;
+import com.example.movierecommendations.member.repository.*;
 import com.example.movierecommendations.member.vo.MemberStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -12,12 +10,133 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class MemberService {
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
+    private final SurveyRepository surveyRepository;
+    private final ReviewRepository reviewRepository;
+    private final MovieInfoRepository movieInfoRepository;
+    private final MovieActorRepository movieActorRepository;
+    private final MovieDirectorRepository movieDirectorRepository;
+    private final MovieGenreRepository movieGenreRepository;
+
+    // 특정 사용자의 모든 정보를 가져오는 서비스 메서드
+    public UserMovieInfoResponse getUserMovieInfo(Long memberId) {
+        // 사용자 정보 조회
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new RuntimeException("Member not found"));
+
+        // 설문조사 정보 조회
+        Survey survey = surveyRepository.findByMemberId(memberId)
+                .orElseThrow(() -> new RuntimeException("Survey not found"));
+
+        // 사용자 ID로 모든 리뷰 조회
+        List<Review> reviews = reviewRepository.findByMember_MemberId(memberId);
+
+        // 리뷰를 ReviewDTO로 변환
+        List<ReviewDTO> reviewDTOs = reviews.stream()
+                .map(review -> ReviewDTO.builder()
+                        .reviewId(review.getReviewId())
+                        .movieId(review.getMovieId())
+                        .ranked(review.getRanked())
+                        .createdAt(review.getCreatedAt())
+                        .build())
+                .collect(Collectors.toList());
+
+        // 선호 장르 및 선호 배우 정보 조회
+        List<String> preferredGenres = member.getPreferredGenres()
+                .stream()
+                .map(PreferredGenre::getGenre)
+                .collect(Collectors.toList());
+
+        List<String> preferredActors = member.getPreferredActor()
+                .stream()
+                .map(PreferredActor::getActor)
+                .collect(Collectors.toList());
+
+        // 리뷰별 관련된 영화 정보 및 그에 대한 배우, 감독, 장르 정보 조회
+        List<UserMovieInfoResponse.ReviewInfo> reviewInfos = reviews.stream().map(review -> {
+            MovieInfo movieInfo = movieInfoRepository.findByReviewId(review.getReviewId());
+            List<MovieActor> actors = movieActorRepository.findByMovieInfo(movieInfo);
+            List<MovieDirector> directors = movieDirectorRepository.findByMovieInfo(movieInfo);
+            List<MovieGenre> genres = movieGenreRepository.findByMovieInfo(movieInfo);
+
+            return UserMovieInfoResponse.ReviewInfo.builder()
+                    .reviewId(review.getReviewId())
+                    .movieInfo(movieInfo)
+                    .actors(actors.stream().map(MovieActor::getActor).collect(Collectors.toList()))
+                    .directors(directors.stream().map(MovieDirector::getDirector).collect(Collectors.toList()))
+                    .genres(genres.stream().map(MovieGenre::getGenre).collect(Collectors.toList()))
+                    .build();
+        }).collect(Collectors.toList());
+
+        // 응답 DTO 반환
+        return UserMovieInfoResponse.builder()
+                .member(member)
+                .survey(survey)
+                .preferredGenres(preferredGenres) // 선호 장르
+                .preferredActors(preferredActors) // 선호 배우
+                .reviews(reviewDTOs)
+                .reviewInfos(reviewInfos) // 리뷰 정보
+                .build();
+    }
+
+    // 전체 사용자 정보를 가져오는 서비스 메서드
+    public List<UserMovieInfoResponse> getAllUserMovieInfo() {
+        // 모든 사용자 조회
+        List<Member> members = memberRepository.findAll();
+
+        // 각 사용자에 대한 정보 조회
+        return members.stream().map(member -> {
+            // 설문조사 정보 조회
+            Survey survey = surveyRepository.findByMemberId(member.getMemberId())
+                    .orElseThrow(() -> new RuntimeException("Survey not found"));
+
+            // 사용자 ID로 모든 리뷰 조회
+            List<Review> reviews = reviewRepository.findByMember_MemberId(member.getMemberId());
+
+            // 리뷰별 영화 및 관련 정보 조회
+            List<UserMovieInfoResponse.ReviewInfo> reviewInfos = reviews.stream().map(review -> {
+                MovieInfo movieInfo = movieInfoRepository.findByReviewId(review.getReviewId());
+                List<MovieActor> actors = movieActorRepository.findByMovieInfo(movieInfo);
+                List<MovieDirector> directors = movieDirectorRepository.findByMovieInfo(movieInfo);
+                List<MovieGenre> genres = movieGenreRepository.findByMovieInfo(movieInfo);
+
+                return UserMovieInfoResponse.ReviewInfo.builder()
+                        .reviewId(review.getReviewId())
+                        .movieInfo(movieInfo)
+                        .actors(actors.stream().map(MovieActor::getActor).collect(Collectors.toList()))
+                        .directors(directors.stream().map(MovieDirector::getDirector).collect(Collectors.toList()))
+                        .genres(genres.stream().map(MovieGenre::getGenre).collect(Collectors.toList()))
+                        .build();
+            }).collect(Collectors.toList());
+
+            // 선호 장르 및 선호 배우 정보 조회
+            List<String> preferredGenres = member.getPreferredGenres()
+                    .stream()
+                    .map(PreferredGenre::getGenre)
+                    .collect(Collectors.toList());
+
+            List<String> preferredActors = member.getPreferredActor()
+                    .stream()
+                    .map(PreferredActor::getActor)
+                    .collect(Collectors.toList());
+
+            // 사용자별 정보 응답 DTO 생성
+            return UserMovieInfoResponse.builder()
+                    .member(member)
+                    .survey(survey)
+                    .reviewInfos(reviewInfos)
+                    .preferredGenres(preferredGenres)
+                    .preferredActors(preferredActors)
+                    .build();
+        }).collect(Collectors.toList());
+    }
 
     // 회원가입
     @Transactional

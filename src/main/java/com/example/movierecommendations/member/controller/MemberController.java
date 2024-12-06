@@ -35,118 +35,16 @@ public class MemberController {
     private final MovieDirectorRepository movieDirectorRepository;
     private final MovieGenreRepository movieGenreRepository;
 
-    // ‘특정 사용자’의 모든 정보 조회(회원/설문조사/리뷰/영화정보/감독/배우/장르)
-    @GetMapping(value="/user/{memberId}", produces = "application/json")
+    // 특정 사용자의 모든 정보 조회 API
+    @GetMapping(value = "/user/{memberId}", produces = "application/json")
     public UserMovieInfoResponse getUserMovieInfo(@PathVariable Long memberId) {
-        // 사용자 정보 조회
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new RuntimeException("Member not found"));
-
-        // 설문조사 정보 조회
-        Survey survey = surveyRepository.findByMemberId(memberId)
-                .orElseThrow(() -> new RuntimeException("Survey not found"));
-
-        // 사용자 ID로 모든 리뷰 조회
-        List<Review> reviews = reviewRepository.findByMember_MemberId(memberId);
-
-        // 선호 장르 및 선호 배우 정보 조회
-        List<String> preferredGenres = member.getPreferredGenres()
-                .stream()
-                .map(PreferredGenre::getGenre)
-                .collect(Collectors.toList());
-
-        List<String> preferredActors = member.getPreferredActor()
-                .stream()
-                .map(PreferredActor::getActor)
-                .collect(Collectors.toList());
-
-        // 리뷰별 관련된 영화 정보 및 그에 대한 배우, 감독, 장르 정보 조회
-        List<UserMovieInfoResponse.ReviewInfo> reviewInfos = reviews.stream().map(review -> {
-            MovieInfo movieInfo = movieInfoRepository.findByReviewId(review.getReviewId());
-            List<MovieActor> actors = movieActorRepository.findByMovieInfo(movieInfo);
-            List<MovieDirector> directors = movieDirectorRepository.findByMovieInfo(movieInfo);
-            List<MovieGenre> genres = movieGenreRepository.findByMovieInfo(movieInfo);
-
-            return UserMovieInfoResponse.ReviewInfo.builder()
-                    .reviewId(review.getReviewId())
-                    .movieInfo(movieInfo)
-                    .actors(actors.stream().map(MovieActor::getActor).collect(Collectors.toList()))
-                    .directors(directors.stream().map(MovieDirector::getDirector).collect(Collectors.toList()))
-                    .genres(genres.stream().map(MovieGenre::getGenre).collect(Collectors.toList()))
-                    .build();
-        }).collect(Collectors.toList());
-
-        // 응답 DTO 반환
-        return UserMovieInfoResponse.builder()
-                .member(member)
-                .survey(survey)
-                .preferredGenres(preferredGenres)  // 선호 장르 추가
-                .preferredActors(preferredActors)
-                .reviewInfos(reviewInfos)
-                .build();
+        return memberService.getUserMovieInfo(memberId);
     }
 
-    // 영화 및 관련 정보 조회 응답 DTO
-    @Getter
-    @Builder
-    public static class UserMovieInfoResponse {
-        private Member member;  // 사용자 정보 추가
-        private Survey survey;  // 설문조사 정보 추가
-        private List<String> preferredGenres; // 선호 장르 추가
-        private List<String> preferredActors; // 선호 배우 추가
-        private List<ReviewInfo> reviewInfos;  // 리뷰 정보 리스트 추가
-
-        @Builder
-        @Getter
-        public static class ReviewInfo {
-            private Long reviewId;
-            private MovieInfo movieInfo;
-            private List<String> actors;
-            private List<String> directors;
-            private List<String> genres;
-        }
-    }
-
-    // ‘전체 사용자’의 모든 정보 조회(회원/설문조사/리뷰/영화정보/감독/배우/장르)
+    // 전체 사용자의 모든 정보 조회 API
     @GetMapping(value = "/users", produces = "application/json")
     public ResponseEntity<List<UserMovieInfoResponse>> getAllUserMovieInfo() {
-        // 모든 사용자 조회
-        List<Member> members = memberRepository.findAll();
-
-        // 각 사용자에 대해 정보 조회 후 리스트에 담기
-        List<UserMovieInfoResponse> userMovieInfoResponses = members.stream().map(member -> {
-            // 설문조사 정보 조회
-            Survey survey = surveyRepository.findByMemberId(member.getMemberId())
-                    .orElseThrow(() -> new RuntimeException("Survey not found"));
-
-            // 사용자 ID로 모든 리뷰 조회
-            List<Review> reviews = reviewRepository.findByMember_MemberId(member.getMemberId());
-
-            // 리뷰별 관련된 영화 정보 및 그에 대한 배우, 감독, 장르 정보 조회
-            List<UserMovieInfoResponse.ReviewInfo> reviewInfos = reviews.stream().map(review -> {
-                MovieInfo movieInfo = movieInfoRepository.findByReviewId(review.getReviewId());
-                List<MovieActor> actors = movieActorRepository.findByMovieInfo(movieInfo);
-                List<MovieDirector> directors = movieDirectorRepository.findByMovieInfo(movieInfo);
-                List<MovieGenre> genres = movieGenreRepository.findByMovieInfo(movieInfo);
-
-                return UserMovieInfoResponse.ReviewInfo.builder()
-                        .reviewId(review.getReviewId())
-                        .movieInfo(movieInfo)
-                        .actors(actors.stream().map(MovieActor::getActor).collect(Collectors.toList()))
-                        .directors(directors.stream().map(MovieDirector::getDirector).collect(Collectors.toList()))
-                        .genres(genres.stream().map(MovieGenre::getGenre).collect(Collectors.toList()))
-                        .build();
-            }).collect(Collectors.toList());
-
-            // 응답 DTO 반환
-            return UserMovieInfoResponse.builder()
-                    .member(member)
-                    .survey(survey)
-                    .reviewInfos(reviewInfos)
-                    .build();
-        }).collect(Collectors.toList());
-
-        // 전체 사용자 정보 리스트 반환
+        List<UserMovieInfoResponse> userMovieInfoResponses = memberService.getAllUserMovieInfo();
         return ResponseEntity.ok(userMovieInfoResponses);
     }
 

@@ -22,9 +22,6 @@ public class Review {
 
     private int movieId;
 
-//    @Column(length = 1000)
-//    private String content;
-
     private String ranked;
 
     @CreatedDate
