@@ -60,6 +60,11 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-logging'
 
 }
+
+tasks.withType(JavaCompile).configureEach {
+	options.compilerArgs = options.compilerArgs + ['-parameters']
+}
+
 //
 //tasks.named('test') {
 //	useJUnitPlatform()

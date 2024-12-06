@@ -51,12 +51,12 @@ public class AIModelService {
 
     // FastAPI에서 추천 결과를 받아오는 메서드
     @Async
-    public void callHRMModel(UserMovieInfoResponse inputData, Long memberId) {
-        logger.info("Calling FastAPI HRM model with input data: {}", inputData);
+    public void callHRMModel(String jsonInputData, Long memberId) {
+        logger.info("Calling FastAPI HRM model with input data: {}", jsonInputData);
 
         webClient.post()
                 .uri("/recom-hybrid")
-                .bodyValue(inputData)
+                .bodyValue(jsonInputData)
                 .retrieve()
                 .onStatus(status -> status.is4xxClientError() || status.is5xxServerError(),
                         clientResponse -> Mono.error(new RuntimeException("API error: " + clientResponse.statusCode())))
@@ -79,8 +79,6 @@ public class AIModelService {
                     throw new RuntimeException("Error calling FastAPI HRM model", ex);
                 });
     }
-
-
 
     // FastAPI에서 LLM 추천 결과를 받아오는 메서드
     @Async
