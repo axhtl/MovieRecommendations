@@ -37,9 +37,11 @@ const LoginPage = () => {
 
         // role에 따라 페이지 이동
         if (role === 'ADMIN') {
-          navigate('/admin/dashboard', { replace: true }); // 관리자 페이지로 이동
+          navigate('/admin/dashboard', { replace: true }); // 관리자 전용 화면으로 이동
+        } else if (role === 'USER') {
+          navigate(`/main/${memberId}`, { replace: true }); // 사용자 전용 화면으로 이동
         } else {
-          navigate(`/main/${memberId}`, { replace: true }); // 일반 사용자 메인 페이지로 이동
+          alert('알 수 없는 권한입니다. 다시 시도해 주세요.');
         }
       } else {
         alert(message || '로그인 실패. 다시 시도해 주세요.');

@@ -2,7 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import Navbar from '../ui/Navbar';
 import MovieList from '../list/MovieList'; // 재사용되는 MovieList
+import Chatbot from '../list/Chatbot'; // 새롭게 만든 Chatbot 컴포넌트
 import '../styles/RecommendPage.css';
+import '../styles/Chatbot.css';
 
 const RecommendPage = () => {
   const { userId } = useParams();
@@ -11,9 +13,12 @@ const RecommendPage = () => {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  // 채팅창 상태
+  const [chatOpen, setChatOpen] = useState(false);
+
   useEffect(() => {
     const fetchNicknameAndRecommendations = async () => {
-      const accessToken = localStorage.getItem('token');
+      const accessToken = localStorage.getItem('token'); // 토큰 받아오기
 
       if (!userId || !accessToken) {
         setError('로그인이 필요합니다.');
@@ -25,7 +30,7 @@ const RecommendPage = () => {
         // 닉네임 가져오기
         const nicknameResponse = await fetch(`/member/user/${userId}`, {
           headers: {
-            Authorization: `Bearer ${accessToken}`,
+            Authorization: `Bearer ${accessToken}`, // 토큰 추가
           },
         });
 
@@ -42,6 +47,7 @@ const RecommendPage = () => {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
+            Authorization: `Bearer ${accessToken}`, // 토큰 추가
           },
         });
 
@@ -57,7 +63,12 @@ const RecommendPage = () => {
           recommendationsData.map(async (movie) => {
             try {
               const detailResponse = await fetch(
-                `/api/movies/detail/${movie.movieCd}?language=ko`
+                `/api/movies/detail/${movie.movieCd}?language=ko`,
+                {
+                  headers: {
+                    Authorization: `Bearer ${accessToken}`, // 토큰 추가
+                  },
+                }
               );
 
               if (!detailResponse.ok) {
@@ -68,8 +79,8 @@ const RecommendPage = () => {
               const detailData = await detailResponse.json();
               return {
                 id: movie.movieCd,
-                title: detailData.name, // MovieItem에서 사용하는 title
-                posterPath: detailData.poster_path, // MovieItem에서 사용하는 posterPath
+                title: detailData.name,
+                posterPath: detailData.poster_path,
               };
             } catch (error) {
               console.error(`영화 상세 정보 요청 중 오류 발생: ${movie.movieCd}`, error);
@@ -105,13 +116,25 @@ const RecommendPage = () => {
     <div className="recommend-page">
       <Navbar />
       <div className="recommend-content">
-        <h2>{nickname ? `${nickname} 님을 위한 추천 영화는?` : '추천 영화 목록'}</h2>
+        <h2>{nickname} 님을 위한 추천 영화는?</h2>
         {error ? (
           <p className="error-message">{error}</p>
         ) : (
           <MovieList movies={recommendations} onMovieClick={(id) => console.log(`영화 클릭됨: ${id}`)} />
         )}
       </div>
+
+      {/* 챗봇 버튼 */}
+      <button
+        className="chatbot-button"
+        aria-label="챗봇 열기"
+        onClick={() => setChatOpen(!chatOpen)}
+      >
+        💬
+      </button>
+
+      {/* Chatbot 컴포넌트 */}
+      <Chatbot isOpen={chatOpen} onClose={() => setChatOpen(false)} />
     </div>
   );
 };
