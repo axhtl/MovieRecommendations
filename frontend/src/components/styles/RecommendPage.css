@@ -54,3 +54,32 @@
     margin-bottom: 10px;
 }
 
+/* 챗봇 버튼 */
+.chatbot-button {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 60px;
+    height: 60px;
+    background-color: #333; /* 녹색 버튼 */
+    border: none;
+    border-radius: 50%;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5); /* 더 강한 그림자 */
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    transition: transform 0.3s, box-shadow 0.3s;
+  }
+  
+  .chatbot-button:hover {
+    transform: scale(1.1); /* 호버 시 확대 */
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.7); /* 호버 시 그림자 강조 */
+  }
+  
+  /* 에러 메시지 */
+  .error-message {
+    font-size: 18px;
+    text-align: center;
+    margin-top: 20px;
+  }
+

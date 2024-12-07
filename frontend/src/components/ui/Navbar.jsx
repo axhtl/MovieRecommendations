@@ -9,17 +9,21 @@ import { faFilm } from '@fortawesome/free-solid-svg-icons';
 function Navbar() {
   const [userId, setUserId] = useState(null); // userId 상태 관리
   const [searchQuery, setSearchQuery] = useState('');
+  const [accessToken, setAccessToken] = useState(null); // JWT 토큰 상태 관리
   const navigate = useNavigate();
 
-  // 로컬 스토리지에서 userId 가져오기
+  // 로컬 스토리지에서 userId와 JWT 토큰 가져오기
   useEffect(() => {
     const storedUserId = localStorage.getItem('memberId');
-    setUserId(storedUserId); // 상태 업데이트
+    const storedAccessToken = localStorage.getItem('token'); // JWT 토큰 가져오기
+
+    setUserId(storedUserId);
+    setAccessToken(storedAccessToken); // 상태 업데이트
   }, []);
 
   const handleLogout = () => {
     localStorage.removeItem('memberId');
-    localStorage.removeItem('accessToken');
+    localStorage.removeItem('token'); // JWT 토큰 삭제
     alert('로그아웃 되었습니다.');
     navigate('/'); // 로그인 페이지로 이동
   };
@@ -37,6 +41,9 @@ function Navbar() {
           includeAdult: false,
           language: 'ko',
           page: 1,
+        },
+        headers: {
+          Authorization: `Bearer ${accessToken}`, // JWT 토큰 포함
         },
       });
 
@@ -63,6 +70,11 @@ function Navbar() {
   };
 
   const navigateTo = (path) => {
+    if (!accessToken) {
+      alert('로그인이 필요합니다.');
+      return;
+    }
+
     if (userId) {
       navigate(path.replace(':userId', userId));
     } else {
@@ -88,7 +100,13 @@ function Navbar() {
           <li>
             <button
               className="nav-link-button"
-              onClick={() => navigateTo('/api/ai/predict/:userId')}
+              onClick={() => {
+                if (!accessToken) {
+                  alert('로그인이 필요합니다.');
+                  return;
+                }
+                navigateTo('/api/ai/predict/:userId');
+              }}
             >
               영화 추천
             </button>
