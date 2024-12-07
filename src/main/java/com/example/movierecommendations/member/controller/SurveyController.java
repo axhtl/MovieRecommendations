@@ -1,8 +1,7 @@
 package com.example.movierecommendations.member.controller;
 
-import com.example.movierecommendations.member.dto.survey.CreateSurveyRequestDTO;
 import com.example.movierecommendations.member.dto.SaveResponseDTO;
-import com.example.movierecommendations.member.dto.survey.SurveyResponseDTO;
+import com.example.movierecommendations.member.dto.survey.CreateSurveyRequestDTO;
 import com.example.movierecommendations.member.service.SurveyService;
 import com.example.movierecommendations.member.vo.Gender;
 import lombok.RequiredArgsConstructor;

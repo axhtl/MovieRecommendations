@@ -1,4 +1,4 @@
-package com.example.movierecommendations.member.dto;
+package com.example.movierecommendations.member.dto.admin;
 
 import com.example.movierecommendations.member.domain.Member;
 import com.example.movierecommendations.member.vo.MemberStatus;
@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class CreateMemberRequestDTO {
+public class CreateAdminRequestDTO {
     private Long memberId;
     private String membername;
     private String password;
@@ -25,7 +25,7 @@ public class CreateMemberRequestDTO {
                 .membername(membername)
                 .password(encodedPassword)
                 .nickname(nickname)
-                .role(Role.USER)
+                .role(Role.ADMIN)
                 .memberStatus(MemberStatus.ACTIVE)
 //                .createdAt(LocalDateTime.now())
                 .build();

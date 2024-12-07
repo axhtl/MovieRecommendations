@@ -36,10 +36,10 @@ public class Member {
     @Enumerated(EnumType.STRING)
     private MemberStatus memberStatus;
 
-    @CreatedDate
-    private LocalDateTime createdAt;
-
-    private LocalDateTime deletedAt;
+//    @CreatedDate
+//    private LocalDateTime createdAt;
+//
+//    private LocalDateTime deletedAt;
 
     private String refreshToken;
 
@@ -71,7 +71,7 @@ public class Member {
         this.memberStatus = memberStatus;
     }
 
-    public void updateDeletedAt(LocalDateTime deletedAt) {
-        this.deletedAt = deletedAt;
-    }
+//    public void updateDeletedAt(LocalDateTime deletedAt) {
+//        this.deletedAt = deletedAt;
+//    }
 }

@@ -50,58 +50,57 @@ dependencies {
 
 	// OkHttpClient
 	implementation 'com.squareup.okhttp3:okhttp:4.10.0'
-}
-<<<<<<< Updated upstream
-//
-=======
 
->>>>>>> Stashed changes
-//tasks.named('test') {
-//	useJUnitPlatform()
-//}
-//
-//
-<<<<<<< Updated upstream
-//def frontendDir = "$projectDir/src/frontend"
-=======
-//def frontendDir = "$projectDir/frontend"
->>>>>>> Stashed changes
-//
-//sourceSets {
-//	main {
-//		resources { srcDirs = ["$projectDir/src/main/resources"]
-//		}
-//	}
-//}
-//
-//processResources { dependsOn "copyReactBuildFiles" }
-//
-//task installReact(type: Exec) {
-//	workingDir "$frontendDir"
-//	inputs.dir "$frontendDir"
-//	group = BasePlugin.BUILD_GROUP
-//	if (System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')) {
-//		commandLine "npm.cmd", "audit", "fix"
-//		commandLine 'npm.cmd', 'install' }
-//	else {
-//		commandLine "npm", "audit", "fix" commandLine 'npm', 'install'
-//	}
-//}
-//
-//task buildReact(type: Exec) {
-//	dependsOn "installReact"
-//	workingDir "$frontendDir"
-//	inputs.dir "$frontendDir"
-//	group = BasePlugin.BUILD_GROUP
-//	if (System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')) {
-//		commandLine "npm.cmd", "run-script", "build"
-//	} else {
-//		commandLine "npm", "run-script", "build"
-//	}
-//}
-//
-//task copyReactBuildFiles(type: Copy) {
-//	dependsOn "buildReact"
-//	from "$frontendDir/build"
-//	into "$projectDir/src/main/resources/static"
-//}
+	// WebFlux 라이브러리 추가
+	implementation 'org.springframework.boot:spring-boot-starter-webflux'
+
+	// 그 외 필요한 의존성들
+	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+	implementation 'org.springframework.boot:spring-boot-starter-logging'
+}
+
+tasks.withType(JavaCompile).configureEach {
+	options.compilerArgs = options.compilerArgs + ['-parameters']
+}
+
+// React 프런트엔드 관련 설정
+def frontendDir = "$projectDir/frontend"
+
+sourceSets {
+	main {
+		resources { srcDirs = ["$projectDir/src/main/resources"] }
+	}
+}
+
+processResources { dependsOn "copyReactBuildFiles" }
+
+task installReact(type: Exec) {
+	workingDir "$frontendDir"
+	inputs.dir "$frontendDir"
+	group = BasePlugin.BUILD_GROUP
+	if (System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')) {
+		commandLine "npm.cmd", "audit", "fix"
+		commandLine 'npm.cmd', 'install'
+	} else {
+		commandLine "npm", "audit", "fix"
+		commandLine 'npm', 'install'
+	}
+}
+
+task buildReact(type: Exec) {
+	dependsOn "installReact"
+	workingDir "$frontendDir"
+	inputs.dir "$frontendDir"
+	group = BasePlugin.BUILD_GROUP
+	if (System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')) {
+		commandLine "npm.cmd", "run-script", "build"
+	} else {
+		commandLine "npm", "run-script", "build"
+	}
+}
+
+task copyReactBuildFiles(type: Copy) {
+	dependsOn "buildReact"
+	from "$frontendDir/build"
+	into "$projectDir/src/main/resources/static"
+}

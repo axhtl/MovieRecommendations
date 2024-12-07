@@ -22,7 +22,7 @@ public class CreateReviewRequestDTO {
                 .member(member)
                 .movieId(movieId)
                 .ranked(ranked)
-                .createdAt(LocalDateTime.now())
+//                .createdAt(LocalDateTime.now())
                 .build();
     }
 }
