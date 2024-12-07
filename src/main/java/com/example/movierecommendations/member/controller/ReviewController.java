@@ -16,7 +16,7 @@ public class ReviewController {
 
     // 시청 영화(리뷰) 등록, 정보 저장
     @PostMapping("/review/{memberId}")
-    public ResponseEntity<SaveResponseDTO> saveReview(@PathVariable Long memberId, @RequestBody CreateReviewRequestDTO request) {
+    public ResponseEntity<SaveResponseDTO> saveReview(@PathVariable("memberId") Long memberId, @RequestBody CreateReviewRequestDTO request) {
         Long reviewId = reviewService.saveReview(memberId, request);
         return ResponseEntity.ok(new SaveResponseDTO(
                 reviewId, HttpStatus.OK.value(), "시청한 영화 기록이 정상적으로 등록되었습니다."
@@ -25,7 +25,7 @@ public class ReviewController {
 
     // 시청 영화(리뷰) 삭제 - 특정 리뷰 삭제
     @DeleteMapping("/review/{reviewId}")
-    public ResponseEntity<String> deleteReview(@PathVariable Long reviewId) {
+    public ResponseEntity<String> deleteReview(@PathVariable("reviewId") Long reviewId) {
         reviewService.deleteReviewById(reviewId);
         return ResponseEntity.ok("후기가 성공적으로 삭제되었습니다.");
     }

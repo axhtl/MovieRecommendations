@@ -32,7 +32,7 @@ public class MemberController {
 
     // 특정 사용자의 영화 제목 리스트 반환 API
     @GetMapping("/{memberId}/movie-titles")
-    public ResponseEntity<List<String>> getUserMovieTitles(@PathVariable Long memberId) {
+    public ResponseEntity<List<String>> getUserMovieTitles(@PathVariable("memberId") Long memberId) {
         // Service 호출을 통해 제목 리스트 가져오기
         List<String> titles = memberService.getUserMovieTitles(memberId);
         return ResponseEntity.ok(titles); // 200 OK와 함께 제목 리스트 반환
@@ -98,7 +98,7 @@ public class MemberController {
     // 비밀번호 수정
     @PutMapping("/password/{memberId}")
     public ResponseEntity<String> updatePassword(
-            @PathVariable Long memberId,
+            @PathVariable("memberId") Long memberId,
             @RequestBody PasswordUpdateRequestDTO passwordUpdateRequest) {
 
         memberService.updatePassword(memberId, passwordUpdateRequest);
@@ -108,7 +108,7 @@ public class MemberController {
     // 닉네임 수정
     @PutMapping("/nickname/{memberId}")
     public ResponseEntity<String> updateNickname(
-            @PathVariable Long memberId,
+            @PathVariable("memberId") Long memberId,
             @RequestBody NicknameUpdateRequestDTO nicknameUpdateRequest) {
 
         memberService.updateNickname(memberId, nicknameUpdateRequest);
@@ -117,7 +117,7 @@ public class MemberController {
 
     // 회원 탈퇴
     @PutMapping("/withdraw/{memberId}")
-    public ResponseEntity<String> withdrawMember(@PathVariable Long memberId) {
+    public ResponseEntity<String> withdrawMember(@PathVariable("memberId") Long memberId) {
         memberService.withdrawMember(memberId);
         return ResponseEntity.ok("회원탈퇴가 성공적으로 처리되었습니다.");
     }
