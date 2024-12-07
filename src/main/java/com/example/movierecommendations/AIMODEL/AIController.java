@@ -126,16 +126,16 @@ public class AIController {
 
 
 
-    // LLM 모델을 호출하는 메서드
-    @PostMapping("/predict2/{memberId}")
-    public CompletableFuture<ResponseEntity<List<String>>> LLMpredict(@PathVariable Long memberId) {
-        // 사용자별 영화 정보 가져오기
-        UserMovieInfoResponse inputData = memberService.getUserMovieInfo(memberId);
-
-        // LLM 모델 호출 (AIModelService의 callLLMModel 사용)
-        aiModelService.callLLMModel(inputData, memberId);
-
-        // 즉시 응답을 반환 (비동기 방식이므로 결과는 나중에 처리됨)
-        return CompletableFuture.supplyAsync(() -> ResponseEntity.ok(List.of("LLM recommendation initiated")));
-    }
+//    // LLM 모델을 호출하는 메서드
+//    @PostMapping("/predict2/{memberId}")
+//    public CompletableFuture<ResponseEntity<List<String>>> LLMpredict(@PathVariable Long memberId) {
+//        // 사용자별 영화 정보 가져오기
+//        UserMovieInfoResponse inputData = memberService.getUserMovieInfo(memberId);
+//
+//        // LLM 모델 호출 (AIModelService의 callLLMModel 사용)
+//        aiModelService.callLLMModel(inputData, memberId);
+//
+//        // 즉시 응답을 반환 (비동기 방식이므로 결과는 나중에 처리됨)
+//        return CompletableFuture.supplyAsync(() -> ResponseEntity.ok(List.of("LLM recommendation initiated")));
+//    }
 }

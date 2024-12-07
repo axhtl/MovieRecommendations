@@ -291,27 +291,27 @@ public class AIModelService {
     }
 
 
-
-    // FastAPI에서 LLM 추천 결과를 받아오는 메서드
-    @Async
-    public void callLLMModel(UserMovieInfoResponse inputData, Long memberId) {
-        logger.info("Calling FastAPI LLM model with input data: {}", inputData);
-
-        webClient.post()
-                .uri("/api/ai/predict/llm")
-                .bodyValue(inputData)
-                .retrieve()
-                .onStatus(status -> status.is4xxClientError() || status.is5xxServerError(),
-                        clientResponse -> Mono.error(new RuntimeException("API error: " + clientResponse.statusCode())))
-                .bodyToMono(new ParameterizedTypeReference<List<String>>() {}) // 타입을 명확히 지정
-                .doOnTerminate(() -> logger.info("Finished LLM recommendation call"))
-                .doOnError(ex -> logger.error("Error calling FastAPI LLM model: {}", ex.getMessage()))
-                .subscribe(result -> {
-                    logger.info("Received LLM recommendations: {}", result);
-                    // LLM 추천 결과를 Recommendation 테이블에 저장
-                    saveLLMRecommendationResult(memberId, result);
-                });
-    }
+//
+//    // FastAPI에서 LLM 추천 결과를 받아오는 메서드
+//    @Async
+//    public void callLLMModel(UserMovieInfoResponse inputData, Long memberId) {
+//        logger.info("Calling FastAPI LLM model with input data: {}", inputData);
+//
+//        webClient.post()
+//                .uri("/api/ai/predict/llm")
+//                .bodyValue(inputData)
+//                .retrieve()
+//                .onStatus(status -> status.is4xxClientError() || status.is5xxServerError(),
+//                        clientResponse -> Mono.error(new RuntimeException("API error: " + clientResponse.statusCode())))
+//                .bodyToMono(new ParameterizedTypeReference<List<String>>() {}) // 타입을 명확히 지정
+//                .doOnTerminate(() -> logger.info("Finished LLM recommendation call"))
+//                .doOnError(ex -> logger.error("Error calling FastAPI LLM model: {}", ex.getMessage()))
+//                .subscribe(result -> {
+//                    logger.info("Received LLM recommendations: {}", result);
+//                    // LLM 추천 결과를 Recommendation 테이블에 저장
+//                    saveLLMRecommendationResult(memberId, result);
+//                });
+//    }
 
 
 
