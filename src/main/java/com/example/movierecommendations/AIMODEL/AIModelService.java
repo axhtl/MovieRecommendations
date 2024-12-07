@@ -1,11 +1,5 @@
 package com.example.movierecommendations.AIMODEL;
 
-
-import com.example.movierecommendations.recommended.repository.HrmRecommendationRepository;
-import com.example.movierecommendations.recommended.repository.LlmRecommendationRepository;
-import com.example.movierecommendations.recommended.service.HrmRecommendationService;
-import com.example.movierecommendations.recommended.service.LlmRecommendationService;
-
 import io.netty.channel.ChannelOption;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -30,26 +24,12 @@ import java.util.Map;
 public class AIModelService {
 
     private static final Logger logger = LoggerFactory.getLogger(AIModelService.class);
-
     private final WebClient webClient;
-    private final LlmRecommendationService llmRecommendationService;
-    private final HrmRecommendationService hrmRecommendationService;
-    private final HrmRecommendationRepository hrmRecommendationRepository;
-    private final LlmRecommendationRepository llmRecommendationRepository;
-
-
 
     // 생성자에서 WebClient.Builder를 주입받아 webClient를 초기화
     @Autowired
-    public AIModelService(WebClient.Builder webClientBuilder, LlmRecommendationService llmRecommendationService,
-                          HrmRecommendationService hrmRecommendationService,
-                          HrmRecommendationRepository hrmRecommendationRepository,
-                          LlmRecommendationRepository llmRecommendationRepository) {
+    public AIModelService(WebClient.Builder webClientBuilder) {
         this.webClient = webClientBuilder.baseUrl("http://127.0.0.1:8086").build(); // WebClient 생성
-        this.llmRecommendationService = llmRecommendationService;
-        this.hrmRecommendationService = hrmRecommendationService;
-        this.hrmRecommendationRepository = hrmRecommendationRepository;
-        this.llmRecommendationRepository = llmRecommendationRepository;
     }
 
 
