@@ -12,6 +12,7 @@ import java.util.List;
 
 @Component
 public class JwtTokenProvider {
+
     @Value("${jwt.token.secret}")
     private String secretKey;
 
@@ -101,3 +102,5 @@ public class JwtTokenProvider {
         return new UsernamePasswordAuthenticationToken(membername, null, List.of(new SimpleGrantedAuthority("ROLE_USER")));
     }
 }
+
+

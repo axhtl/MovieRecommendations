@@ -35,26 +35,44 @@ public class SecurityConfig {
 //
 //        return http.build();
 //    }
-@Bean
-public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-    http
-            .csrf(csrf -> csrf.disable()) // CSRF 비활성화
-            .authorizeHttpRequests(authorize -> authorize
-                    // 인증 없이 접근 가능한 경로들
-                    .requestMatchers("/static/**", "/error", "/favicon.ico", "/robots.txt", "/icons/**").permitAll()
 
-                    // 인증이 필요한 경로들
-                    .requestMatchers("/api/ai/predict/**").authenticated()
 
-                    // 그 외 모든 경로는 인증 필요
-                    .anyRequest().permitAll()
-            )
-            // JWT 필터를 모든 경로에 적용하기 전에 예외를 설정
-            .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class)
-            .headers(headers -> headers.frameOptions(frameOptions -> frameOptions.sameOrigin())); // 프레임 사용 허용
+//@Bean
+//public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+//    http
+//            .csrf(csrf -> csrf.disable()) // CSRF 비활성화
+//            .authorizeHttpRequests(authorize -> authorize
+//                    // 인증 없이 접근 가능한 경로들
+//                    .requestMatchers("/static/**", "/error", "/favicon.ico", "/robots.txt", "/icons/**").permitAll()
+//
+//                    // 인증이 필요한 경로들
+//                    .requestMatchers("/api/ai/predict/**").authenticated()
+//
+//                    .anyRequest().permitAll()
+//            )
+//            // JWT 필터를 모든 경로에 적용하기 전에 예외를 설정
+//            .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class)
+//            .headers(headers -> headers.frameOptions(frameOptions -> frameOptions.sameOrigin())); // 프레임 사용 허용
+//
+//    return http.build();
+//}
 
-    return http.build();
-}
+
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http
+                .csrf(csrf -> csrf.disable()) // CSRF 비활성화
+                .authorizeRequests(authorize -> authorize
+                        // 모든 요청에 대해 인증을 요구하지 않음
+                        .requestMatchers("/**").permitAll()  // 모든 경로에 대해 인증 없이 접근 허용
+                )
+                // JWT 필터를 모든 경로에 적용하기 전에 예외를 설정
+                .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class)
+                .headers(headers -> headers.frameOptions(frameOptions -> frameOptions.sameOrigin())); // 프레임 사용 허용
+
+        return http.build();
+    }
+
 
     @Bean
     public PasswordEncoder passwordEncoder() {
