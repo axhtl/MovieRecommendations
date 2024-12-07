@@ -14,7 +14,6 @@ const MemberInfo = ({ member, survey, preferredGenres, preferredActors })=> {
       <div className="member-card">
         <h3>{member.nickname} 님의 정보</h3>
         <p><strong>ID:</strong> {member.membername}</p>
-        <p><strong>성별:</strong> {survey.gender || '미입력'} <strong>  나이:</strong> {survey.age || '미입력'}</p>
         <p><strong>선호 장르:</strong>
         <ul className="genre-list">
           {preferredGenres && preferredGenres.length > 0 ? (

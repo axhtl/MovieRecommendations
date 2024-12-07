@@ -3,16 +3,16 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import '../styles/SurveyPage.css';
 
 const genresList = [
-  '드라마', '애니메이션', '기타', '액션', '어드벤쳐', '미스터리', '가족',
+  '드라마', '애니메이션', '액션', '어드벤쳐', '미스터리', '가족',
   '코미디', '뮤지컬', '범죄', '공연', '공포(호러)', '다큐멘터리',
-  '판타지', '성인물(에로)', 'SF', '스릴러', '전쟁', '멜로/로맨스'
+  '판타지', '성인물(에로)', 'SF', '스릴러', '전쟁', '멜로/로맨스', '기타',
 ];
 
 const SurveyPage = () => {
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
   const userId = searchParams.get('userId');
-
+  
   const navigate = useNavigate();
   const [actors, setActors] = useState('');
   const [actorList, setActorList] = useState([]);
@@ -66,6 +66,7 @@ const SurveyPage = () => {
         alert('설문 제출에 실패했습니다. 다시 시도해 주세요.');
       }
     } catch (error) {
+      console.error('Error:', error);
       alert('오류가 발생했습니다. 잠시 후 다시 시도해 주세요.');
     }
   };

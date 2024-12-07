@@ -25,17 +25,22 @@ const LoginPage = () => {
         password: password,
       });
 
-      const { memberId, statusCode, message, accessToken } = response.data;
+      const { memberId, role, statusCode, message, accessToken } = response.data;
 
       if (statusCode === 200 && memberId && accessToken) {
         alert(message || '로그인 성공!');
-        
+
         // Local Storage에 토큰 및 사용자 정보 저장
         localStorage.setItem('memberId', memberId);
+        localStorage.setItem('role', role); // role 저장
         localStorage.setItem('token', accessToken);
 
-        // 메인 페이지로 이동
-        navigate(`/main/${memberId}`, { replace: true });
+        // role에 따라 페이지 이동
+        if (role === 'ADMIN') {
+          navigate('/admin/dashboard', { replace: true }); // 관리자 페이지로 이동
+        } else {
+          navigate(`/main/${memberId}`, { replace: true }); // 일반 사용자 메인 페이지로 이동
+        }
       } else {
         alert(message || '로그인 실패. 다시 시도해 주세요.');
       }

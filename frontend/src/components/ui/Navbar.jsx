@@ -88,7 +88,7 @@ function Navbar() {
           <li>
             <button
               className="nav-link-button"
-              onClick={() => navigateTo('/recommend')}
+              onClick={() => navigateTo('/api/ai/predict/:userId')}
             >
               영화 추천
             </button>
