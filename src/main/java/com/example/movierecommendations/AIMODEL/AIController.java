@@ -32,8 +32,37 @@ public class AIController {
     }
 
     // HRM 모델을 호출하는 메서드
+//    @PostMapping("/predict/{memberId}")
+//    public CompletableFuture<ResponseEntity<List<String>>> HRMpredict(@PathVariable Long memberId) throws JsonProcessingException {
+//        // 사용자별 영화 정보 가져오기
+//        UserMovieInfoResponse inputData = memberService.getUserMovieInfo(memberId);
+//
+//        // Jackson을 사용하여 inputData를 JSON 문자열로 변환
+//        ObjectMapper objectMapper = new ObjectMapper();
+//        // Java 8 날짜/시간 모듈 등록
+//        objectMapper.registerModule(new JavaTimeModule());
+//        // null 값 필드 제외 설정
+//        objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+//        // JSON 문자열로 변환
+//        String jsonInputData = objectMapper.writeValueAsString(inputData);
+//
+//        log.info("영화조회정보:{}", jsonInputData);
+//
+//        // HRM 모델을 호출하고 결과를 반환
+//        // HRM 추천 결과가 성공적으로 처리된 후, 클라이언트에게 추천 결과를 반환
+//        // 추천 결과를 응답으로 반환
+//        return aiModelService.callHRMModel(jsonInputData, memberId)
+//                .thenApply(ResponseEntity::ok)
+//                .exceptionally(ex -> {
+//                    // 예외 처리: 에러가 발생한 경우
+//                    log.error("Error calling HRM model", ex);
+//                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+//                            .body(List.of("Error occurred while processing the recommendation"));
+//                });
+//    }
+
     @PostMapping("/predict/{memberId}")
-    public CompletableFuture<ResponseEntity<List<String>>> HRMpredict(@PathVariable Long memberId) throws JsonProcessingException {
+    public ResponseEntity<List<String>> HRMpredict(@PathVariable Long memberId) throws JsonProcessingException {
         // 사용자별 영화 정보 가져오기
         UserMovieInfoResponse inputData = memberService.getUserMovieInfo(memberId);
 
@@ -48,18 +77,18 @@ public class AIController {
 
         log.info("영화조회정보:{}", jsonInputData);
 
-        // HRM 모델을 호출하고 결과를 반환
-        return aiModelService.callHRMModel(jsonInputData, memberId)
-                .thenApply(result -> {
-                    // HRM 추천 결과가 성공적으로 처리된 후, 클라이언트에게 추천 결과를 반환
-                    return ResponseEntity.ok(result); // 추천 결과를 응답으로 반환
-                })
-                .exceptionally(ex -> {
-                    // 예외 처리: 에러가 발생한 경우
-                    log.error("Error calling HRM model", ex);
-                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                            .body(List.of("Error occurred while processing the recommendation"));
-                });
+        // HRM 모델을 호출하고 결과를 동기적으로 반환
+        try {
+            List<String> result = aiModelService.callHRMModel(jsonInputData, memberId);
+
+            // 추천 결과가 성공적으로 처리된 후, 클라이언트에게 추천 결과를 반환
+            return ResponseEntity.ok(result);
+        } catch (Exception ex) {
+            // 예외 처리: 에러가 발생한 경우
+            log.error("Error calling HRM model", ex);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(List.of("Error occurred while processing the recommendation"));
+        }
     }
 
 

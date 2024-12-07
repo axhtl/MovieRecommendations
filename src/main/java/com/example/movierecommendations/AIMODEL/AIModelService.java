@@ -4,6 +4,7 @@ package com.example.movierecommendations.AIMODEL;
 import com.example.movierecommendations.member.dto.UserMovieInfoResponse;
 import com.example.movierecommendations.recommended.domain.HrmRecommendation;
 import com.example.movierecommendations.recommended.domain.LlmRecommendation;
+import com.example.movierecommendations.recommended.dto.MovieRecommendationDTO;
 import com.example.movierecommendations.recommended.repository.HrmRecommendationRepository;
 import com.example.movierecommendations.recommended.repository.LlmRecommendationRepository;
 import com.example.movierecommendations.recommended.service.HrmRecommendationService;
@@ -25,6 +26,7 @@ import reactor.core.publisher.Mono;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -57,11 +59,111 @@ public class AIModelService {
 
 
     // FastAPI에서 추천 결과를 받아오는 메서드
-    @Async
-    public CompletableFuture<List<String>> callHRMModel(String inputData, Long memberId) {
+//    @Async
+//    public CompletableFuture<List<String>> callHRMModel(String inputData, Long memberId) {
+//        logger.info("Calling FastAPI HRM model with input data: {}", inputData);
+//
+//        return webClient.post()
+//                .uri("/recom-hybrid")  // FastAPI에서 받는 경로
+//                .bodyValue(inputData)   // 요청 본문에 inputData를 담아 보냄
+//                .retrieve()
+//                .onStatus(status -> status.is4xxClientError() || status.is5xxServerError(),
+//                        clientResponse -> Mono.error(new RuntimeException("API error: " + clientResponse.statusCode())))
+//                .bodyToMono(new ParameterizedTypeReference<List<String>>() {
+//                }) // FastAPI로부터 응답받을 타입을 지정 (List<String>)
+//                .toFuture()  // 비동기적으로 처리할 수 있게 Future로 변환
+//                .thenApply(result -> {
+//                    logger.info("Received HRM recommendations: {}", result);
+//                    // HRM 추천 결과를 Recommendation 테이블에 저장
+//                    saveHRMRecommendationResult(memberId, result);
+//                    return result;  // HRM 추천 결과 반환
+//                })
+//                .exceptionally(ex -> {
+//                    if (ex instanceof WebClientResponseException) {
+//                        WebClientResponseException webClientEx = (WebClientResponseException) ex;
+//                        logger.error("WebClient Error: {} with response: {}", ex.getMessage(), webClientEx.getResponseBodyAsString());
+//                    } else {
+//                        logger.error("Error calling FastAPI HRM model: {}", ex.getMessage());
+//                    }
+//                    // 오류 발생 시 기본 에러 메시지를 반환
+//                    return List.of("Error occurred while calling HRM model");
+//                });
+//    }
+//
+
+//    @Async
+//    public CompletableFuture<List<String>> callHRMModel(String inputData, Long memberId) {
+//        logger.info("Calling FastAPI HRM model with input data: {}", inputData);
+//
+//        return webClient.post()
+//                .uri("/recom-hybrid")  // FastAPI에서 받는 경로
+//                .bodyValue(inputData)   // 요청 본문에 inputData를 담아 보냄
+//                .retrieve()
+//                .onStatus(status -> status.is4xxClientError() || status.is5xxServerError(),
+//                        clientResponse -> Mono.error(new RuntimeException("API error: " + clientResponse.statusCode())))
+//                .bodyToMono(new ParameterizedTypeReference<List<String>>() {
+//                }) // FastAPI로부터 응답받을 타입을 지정 (List<String>)
+//                .toFuture()  // 비동기적으로 처리할 수 있게 Future로 변환
+//                .thenApply(result -> {
+//                    logger.info("Received HRM recommendations: {}", result);
+//
+//                    // HRM 추천 결과를 MovieRecommendationDTO로 변환
+//                    List<MovieRecommendationDTO> movieRecommendationDTOs = result.stream()
+//                            .map(MovieRecommendationDTO::new)  // MovieRecommendationDTO 생성
+//                            .collect(Collectors.toList());
+//
+//                    // HRM 추천 결과를 Recommendation 테이블에 저장
+//                    saveHRMRecommendationResult(memberId, movieRecommendationDTOs);
+//                    return result;  // HRM 추천 결과 반환
+//                })
+//                .exceptionally(ex -> {
+//                    if (ex instanceof WebClientResponseException) {
+//                        WebClientResponseException webClientEx = (WebClientResponseException) ex;
+//                        logger.error("WebClient Error: {} with response: {}", ex.getMessage(), webClientEx.getResponseBodyAsString());
+//                    } else {
+//                        logger.error("Error calling FastAPI HRM model: {}", ex.getMessage());
+//                    }
+//                    // 오류 발생 시 기본 에러 메시지를 반환
+//                    return List.of("Error occurred while calling HRM model");
+//                });
+//    }
+
+//    public List<String> callHRMModel(String inputData, Long memberId) {
+//        logger.info("Calling FastAPI HRM model with input data: {}", inputData);
+//
+//        // 동기 방식으로 FastAPI 호출
+//        List<String> result = webClient.post()
+//                .uri("/recom-hybrid")  // FastAPI에서 받는 경로
+//                .bodyValue(inputData)   // 요청 본문에 inputData를 담아 보냄
+//                .retrieve()
+//                .onStatus(status -> status.is4xxClientError() || status.is5xxServerError(),
+//                        clientResponse -> Mono.error(new RuntimeException("API error: " + clientResponse.statusCode())))
+//                .bodyToMono(new ParameterizedTypeReference<List<String>>() {
+//                }) // FastAPI로부터 응답받을 타입을 지정 (List<String>)
+//                .block();  // 동기적으로 처리하도록 `block()` 호출
+//
+//        if (result != null) {
+//            logger.info("Received HRM recommendations: {}", result);
+//
+//            // HRM 추천 결과를 MovieRecommendationDTO로 변환
+////            List<MovieRecommendationDTO> movieRecommendationDTOs = result.stream()
+////                    .map(MovieRecommendationDTO::new)  // MovieRecommendationDTO 생성
+////                    .collect(Collectors.toList());
+//
+//            // HRM 추천 결과를 Recommendation 테이블에 저장
+//            //saveHRMRecommendationResult(memberId, movieRecommendationDTOs);
+//        } else {
+//            logger.error("Failed to receive a valid response from the HRM model.");
+//        }
+//
+//        return result != null ? result : List.of("Error occurred while calling HRM model");
+//    }
+
+    public List<String> callHRMModel(String inputData, Long memberId) {
         logger.info("Calling FastAPI HRM model with input data: {}", inputData);
 
-        return webClient.post()
+        // 동기 방식으로 FastAPI 호출
+        List<String> result = webClient.post()
                 .uri("/recom-hybrid")  // FastAPI에서 받는 경로
                 .bodyValue(inputData)   // 요청 본문에 inputData를 담아 보냄
                 .retrieve()
@@ -69,23 +171,15 @@ public class AIModelService {
                         clientResponse -> Mono.error(new RuntimeException("API error: " + clientResponse.statusCode())))
                 .bodyToMono(new ParameterizedTypeReference<List<String>>() {
                 }) // FastAPI로부터 응답받을 타입을 지정 (List<String>)
-                .toFuture()  // 비동기적으로 처리할 수 있게 Future로 변환
-                .thenApply(result -> {
-                    logger.info("Received HRM recommendations: {}", result);
-                    // HRM 추천 결과를 Recommendation 테이블에 저장
-                    saveHRMRecommendationResult(memberId, result);
-                    return result;  // HRM 추천 결과 반환
-                })
-                .exceptionally(ex -> {
-                    if (ex instanceof WebClientResponseException) {
-                        WebClientResponseException webClientEx = (WebClientResponseException) ex;
-                        logger.error("WebClient Error: {} with response: {}", ex.getMessage(), webClientEx.getResponseBodyAsString());
-                    } else {
-                        logger.error("Error calling FastAPI HRM model: {}", ex.getMessage());
-                    }
-                    // 오류 발생 시 기본 에러 메시지를 반환
-                    return List.of("Error occurred while calling HRM model");
-                });
+                .block();  // 동기적으로 처리하도록 `block()` 호출
+
+        if (result != null) {
+            logger.info("Received HRM recommendations: {}", result);
+        } else {
+            logger.error("Failed to receive a valid response from the HRM model.");
+        }
+
+        return result != null ? result : List.of("Error occurred while calling HRM model");
     }
 
 
@@ -116,7 +210,7 @@ public class AIModelService {
 
 
     // HRM 추천 결과를 저장하는 메서드
-    private void saveHRMRecommendationResult(Long memberId, List<String> recommendedMovies) {
+    private void saveHRMRecommendationResult(Long memberId, List<MovieRecommendationDTO> recommendedMovies) {
         hrmRecommendationService.saveRecommendationForMember(memberId, recommendedMovies);
     }
 
