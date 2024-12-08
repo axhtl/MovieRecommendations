@@ -1,0 +1,85 @@
+/* RecommendPage.css */
+
+.recommend-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: #f0f0f0;
+    height: 100vh;
+    padding-top: 60px;
+}
+
+.recommend-content {
+    width: 80%;
+    max-width: 1200px;
+    background: #fff;
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin-top: 20px;
+}
+
+.recommend-content h2 {
+    margin-bottom: 30px;
+    color: #333;
+    text-align: center;
+}
+
+.movie-list {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.movie-item {
+    width: 180px;
+    text-align: center;
+    background: #f9f9f9;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.movie-item img {
+    width: 100%;
+    height: auto;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+.movie-item p {
+    color: #333;
+    font-size: 16px;
+    margin-bottom: 10px;
+}
+
+/* 챗봇 버튼 */
+.chatbot-button {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 60px;
+    height: 60px;
+    background-color: #333; /* 녹색 버튼 */
+    border: none;
+    border-radius: 50%;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5); /* 더 강한 그림자 */
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    transition: transform 0.3s, box-shadow 0.3s;
+  }
+  
+  .chatbot-button:hover {
+    transform: scale(1.1); /* 호버 시 확대 */
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.7); /* 호버 시 그림자 강조 */
+  }
+  
+  /* 에러 메시지 */
+  .error-message {
+    font-size: 18px;
+    text-align: center;
+    margin-top: 20px;
+  }
+

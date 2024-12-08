@@ -1,0 +1,60 @@
+.upcoming-movies {
+  margin-top: 24px;
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.upcoming-movies h2 {
+  font-size: 19px;
+  color: #333;
+  text-align: left;
+  margin-bottom: 7px;
+  font-weight: 600;
+}
+
+.movie-list {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* 3개의 카드가 가로로 나열 */
+  gap: 20px; /* 카드 간 간격 */
+  justify-items: center; /* 카드를 가운데 정렬 */
+  grid-auto-rows: minmax(200px, auto); /* 카드의 최소 높이를 설정 */
+}
+
+.movie-card {
+  background-color: #fff;
+  border-radius: 6px;
+  padding: 15px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  overflow: hidden;
+  max-width: 240px; /* 카드 최대 너비 설정 */
+  text-align: center;
+}
+
+.movie-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* 호버 시 그림자 강조 */
+}
+
+.movie-poster {
+  width: 100%;
+  border-radius: 10px;
+  height: 150px; /* 고정된 높이 */
+  object-fit: cover;
+}
+
+.movie-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+  margin-top: 15px;
+}
+
+.movie-release-date {
+  font-size: 12px;
+  color: #888;
+  margin-top: 5px;
+}

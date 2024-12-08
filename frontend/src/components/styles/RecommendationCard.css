@@ -1,0 +1,52 @@
+.recommendation-list {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 30px;
+  }
+  
+  .recommendation-card {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    width: 300px;
+  }
+  
+  .recommendation-image {
+    width: 100%;
+    height: auto;
+    border-radius: 5px;
+  }
+  
+  .recommendation-title {
+    font-size: 18px;
+    font-weight: bold;
+    margin: 10px 0;
+  }
+  
+  .recommendation-description {
+    font-size: 14px;
+    color: #555;
+  }
+  
+  .signup-section {
+    margin-top: 50px;
+    text-align: center;
+  }
+  
+  .signup-button {
+    background-color: #333;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+  }
+  
+  .signup-button:hover {
+    background-color: #555;
+  }
+  
