@@ -15,5 +15,5 @@ public class ReviewDTO {
     private Long reviewId;
     private int movieId;
     private String ranked;
-    private LocalDateTime createdAt;
+//    private LocalDateTime createdAt;
 }

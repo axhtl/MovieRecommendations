@@ -66,4 +66,42 @@ public class AIModelService {
 
         return result != null ? result : List.of(Map.of("error", "Error occurred while calling HRM model"));
     }
+
+
+    // FastAPI에서 추천 결과를 받아오는 메서드
+    public List<Map<String, Object>> callLLMModel(String inputData, Long memberId) {
+        logger.info("Calling FastAPI LLM model with input data: {}", inputData);
+
+        // WebClient에 30초 타임아웃 설정
+        WebClient webClientWithTimeout = webClient.mutate()
+                .clientConnector(new ReactorClientHttpConnector(
+                        HttpClient.create()
+                                .responseTimeout(Duration.ofSeconds(30))  // 응답 타임아웃을 30초로 설정
+                                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 30000)  // 연결 타임아웃도 30초로 설정
+                ))
+                .build();
+
+        // 동기 방식으로 FastAPI 호출
+        List<Map<String, Object>> result = webClientWithTimeout.post()
+                .uri("/recom-llm")  // FastAPI에서 받는 경로
+                .contentType(MediaType.TEXT_PLAIN)  // Content-Type을 text/plain으로 설정 (문자열 전송 시)
+                .bodyValue(inputData)  // 요청 본문에 inputData를 담아 보냄 (문자열)
+                .retrieve()
+                .onStatus(status -> status.is4xxClientError() || status.is5xxServerError(),
+                        clientResponse -> Mono.error(new RuntimeException("API error: " + clientResponse.statusCode())))
+                .bodyToMono(new ParameterizedTypeReference<List<Map<String, Object>>>() {
+                }) // FastAPI로부터 응답받을 타입을 지정 (List<Map<String, Object>>)
+                .block();  // 동기적으로 처리하도록 block() 호출
+
+        if (result != null && !result.isEmpty()) {
+            logger.info("Received LLM recommendations: {}", result);
+        } else {
+            logger.error("Failed to receive a valid response from the LLM model.");
+        }
+
+        return result != null ? result : List.of(Map.of("error", "Error occurred while calling LLM model"));
+    }
+
+
+
 }

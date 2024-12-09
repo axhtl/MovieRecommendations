@@ -24,8 +24,8 @@ public class Review {
 
     private String ranked;
 
-    @CreatedDate
-    private LocalDateTime createdAt;
+//    @CreatedDate
+//    private LocalDateTime createdAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")

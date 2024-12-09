@@ -60,4 +60,25 @@ public class AIController {
                     .body(List.of(Map.of("error", "Error occurred while processing the recommendation")));
         }
     }
+
+
+    // HRM 모델을 호출하는 메서드
+    @PostMapping("/chatbot/{memberId}")
+    public ResponseEntity<List<Map<String, Object>>> LLMpredict(@PathVariable Long memberId, @RequestBody String inputString) throws JsonProcessingException {
+        log.info("사용자가 입력한 테스트:{}", inputString);
+
+        // HRM 모델을 호출하고 결과를 동기적으로 반환
+        try {
+            List<Map<String, Object>> result = aiModelService.callLLMModel(inputString, memberId);
+            // 추천 결과가 성공적으로 처리된 후, 클라이언트에게 추천 결과를 JSON 형태로 반환
+            return ResponseEntity.ok(result);  // List<Map<String, Object>> 형태로 반환
+        } catch (Exception ex) {
+            // 예외 처리: 에러가 발생한 경우
+            log.error("Error calling LLM model", ex);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(List.of(Map.of("error", "Error occurred while processing the recommendation")));
+        }
+    }
+
+
 }

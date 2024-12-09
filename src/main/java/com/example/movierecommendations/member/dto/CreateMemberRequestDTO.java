@@ -27,7 +27,7 @@ public class CreateMemberRequestDTO {
                 .nickname(nickname)
                 .role(Role.USER)
                 .memberStatus(MemberStatus.ACTIVE)
-                .createdAt(LocalDateTime.now())
+//                .createdAt(LocalDateTime.now())
                 .build();
     }
 }
