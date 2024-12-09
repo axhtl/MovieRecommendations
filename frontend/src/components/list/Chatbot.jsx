@@ -9,8 +9,8 @@ const Chatbot = ({ isOpen, onClose }) => {
   const userProfile = 'https://via.placeholder.com/40?text=U'; // 사용자 프로필 이미지
   const aiProfile = 'https://via.placeholder.com/40?text=AI'; // AI 프로필 이미지
 
-  // 메시지 전송 처리 (더미 메시지 추가)
-  const handleSend = () => {
+  // 메시지 전송 처리 (AI 응답 활성화)
+  const handleSend = async () => {
     if (!input.trim()) return; // 빈 메시지 처리
 
     const timestamp = new Date().toLocaleTimeString(); // 현재 시간
@@ -25,16 +25,44 @@ const Chatbot = ({ isOpen, onClose }) => {
     // 사용자 메시지 추가
     setMessages((prev) => [...prev, userMessage]);
 
-    // 더미 AI 응답 추가
-    const aiMessage = {
-      sender: 'ai',
-      text: '현재 AI 응답이 비활성화되었습니다.',
-      time: new Date().toLocaleTimeString(),
-      name: aiName,
-      profile: aiProfile,
-    };
+    try {
+      // API 요청 보내기
+      const response = await fetch('http://127.0.0.1:8086/llm', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: input }),
+      });
 
-    setMessages((prev) => [...prev, aiMessage]); // AI 메시지 추가
+      if (!response.ok) {
+        throw new Error('네트워크 응답에 문제가 있습니다.');
+      }
+
+      const data = await response.json();
+      const aiMessage = {
+        sender: 'ai',
+        text: data.llm_response,
+        time: new Date().toLocaleTimeString(),
+        name: aiName,
+        profile: aiProfile,
+      };
+
+      // AI 메시지 추가
+      setMessages((prev) => [...prev, aiMessage]);
+    } catch (error) {
+      console.error('AI 응답 처리 중 오류 발생:', error);
+
+      // 에러 메시지 추가
+      const errorMessage = {
+        sender: 'ai',
+        text: 'AI 응답 처리에 실패했습니다. 나중에 다시 시도해 주세요.',
+        time: new Date().toLocaleTimeString(),
+        name: aiName,
+        profile: aiProfile,
+      };
+
+      setMessages((prev) => [...prev, errorMessage]);
+    }
+
     setInput(''); // 입력 초기화
   };
 
