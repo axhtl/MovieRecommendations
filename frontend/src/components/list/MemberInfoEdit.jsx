@@ -1,64 +1,68 @@
-import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import '../styles/Edit.css';
 
+const genresList = [
+  '드라마', '애니메이션', '액션', '어드벤쳐', '미스터리', '가족',
+  '코미디', '뮤지컬', '범죄', '공연', '공포(호러)', '다큐멘터리',
+  '판타지', '성인물(에로)', 'SF', '스릴러', '전쟁', '멜로/로맨스', '기타',
+];
+
 const Edit = () => {
-  const { memberId } = useParams(); // URL에서 memberId 가져오기
-  const navigate = useNavigate();
-  const [memberData, setMemberData] = useState({
-    password: '',
-    nickname: '',
-    gender: '',
-    age: '',
-    preferredGenres: [],
-    preferredActors: [],
-  });
-  const [newGenre, setNewGenre] = useState('');
+  const [nickname, setNickname] = useState('');
+  const [password, setPassword] = useState('');
+  const [actorList, setActorList] = useState([]);
+  const [selectedGenres, setSelectedGenres] = useState([]);
   const [newActor, setNewActor] = useState('');
+  const [loading, setLoading] = useState(true);
+
+  const navigate = useNavigate(); // navigate 추가
 
   useEffect(() => {
-    // 회원 정보 불러오기
-    const fetchMemberData = async () => {
+    const fetchUserData = async () => {
       try {
-        const response = await axios.get(`/survey/${memberId}`); // 설문조사 정보 API 호출
-        setMemberData(response.data);
+        const token = localStorage.getItem('token');
+        const response = await fetch('/member/user/1', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setNickname(data.nickname || '');
+          setActorList(data.preferredActors || []);
+          setSelectedGenres(data.preferredGenres || []);
+        } else {
+          alert('사용자 데이터를 불러오는 데 실패했습니다.');
+        }
       } catch (error) {
-        console.error('회원 정보 불러오기 오류:', error);
+        console.error('데이터 로드 오류:', error);
+        alert('사용자 데이터를 불러오는 중 오류가 발생했습니다.');
+      } finally {
+        setLoading(false);
       }
     };
 
-    fetchMemberData();
-  }, [memberId]);
+    fetchUserData();
+  }, []);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setMemberData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
-  };
-
-  const updateStateAfterChange = (field, value) => {
-    setMemberData((prevData) => ({
-      ...prevData,
-      [field]: value,
-    }));
-  };
-
-  const handlePasswordChange = async () => {
-    try {
-      await axios.put(`/member/password/${memberId}`, { password: memberData.password });
-      alert('비밀번호가 성공적으로 수정되었습니다.');
-    } catch (error) {
-      console.error('비밀번호 수정 오류:', error);
-      alert('비밀번호 수정에 실패했습니다.');
-    }
-  };
-
+  // 닉네임 수정
   const handleNicknameChange = async () => {
+    if (!nickname.trim()) {
+      alert('닉네임을 입력하세요.');
+      return;
+    }
     try {
-      await axios.put(`/member/nickname/${memberId}`, { nickname: memberData.nickname });
+      const token = localStorage.getItem('token');
+      await fetch(`/member/nickname`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ nickname }),
+      });
       alert('닉네임이 성공적으로 수정되었습니다.');
     } catch (error) {
       console.error('닉네임 수정 오류:', error);
@@ -66,190 +70,170 @@ const Edit = () => {
     }
   };
 
-  const handleWithdraw = async () => {
-    try {
-      await axios.put(`/member/withdraw/${memberId}`);
-      alert('회원 탈퇴가 완료되었습니다.');
-      navigate(`/`); // 홈 페이지로 이동
-    } catch (error) {
-      console.error('회원 탈퇴 오류:', error);
-      alert('회원 탈퇴에 실패했습니다.');
-    }
-  };
-
-  const handleGenderChange = async () => {
-    try {
-      const response = await axios.patch(`/survey/${memberId}/gender`, { gender: memberData.gender });
-      alert('성별이 성공적으로 수정되었습니다.');
-      setMemberData((prevData) => ({
-        ...prevData,
-        gender: response.data.gender, // 서버 응답 데이터를 상태에 반영
-      }));
-    } catch (error) {
-      console.error('성별 수정 오류:', error);
-      alert('성별 수정에 실패했습니다.');
-    }
-  };
-  
-  const handleAgeChange = async () => {
-    try {
-      await axios.patch(`/survey/${memberId}/age`, { age: memberData.age });
-      alert('나이가 성공적으로 수정되었습니다.');
-      updateStateAfterChange('age', memberData.age);
-    } catch (error) {
-      console.error('나이 수정 오류:', error);
-      alert('나이 수정에 실패했습니다.');
-    }
-  };
-
-  const handleAddGenre = async () => {
-    if (!newGenre.trim()) {
-      alert('장르를 입력하세요.');
+  // 비밀번호 수정
+  const handlePasswordChange = async () => {
+    if (!password.trim()) {
+      alert('비밀번호를 입력하세요.');
       return;
     }
     try {
-      const response = await axios.post(`/survey/${memberId}/genre`, { genre: newGenre });
-      alert('선호 장르가 성공적으로 추가되었습니다.');
-      setNewGenre('');
-      setMemberData((prevData) => ({
-        ...prevData,
-        preferredGenres: [...prevData.preferredGenres, response.data],
-      }));
+      const token = localStorage.getItem('token');
+      await fetch(`/member/password`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ password }),
+      });
+      alert('비밀번호가 성공적으로 수정되었습니다.');
+      setPassword('');
     } catch (error) {
-      console.error('선호 장르 추가 오류:', error);
-      alert('선호 장르 추가에 실패했습니다.');
+      console.error('비밀번호 수정 오류:', error);
+      alert('비밀번호 수정에 실패했습니다.');
     }
   };
 
-  const handleDeleteGenre = async (genre) => {
-    try {
-      await axios.delete(`/survey/preferred-genres/${genre}`);
-      alert('선호 장르가 성공적으로 삭제되었습니다.');
-      setMemberData((prevData) => ({
-        ...prevData,
-        preferredGenres: prevData.preferredGenres.filter((g) => g !== genre),
-      }));
-    } catch (error) {
-      console.error('선호 장르 삭제 오류:', error);
-      alert('선호 장르 삭제에 실패했습니다.');
-    }
-  };
-
-  const handleAddActor = async () => {
+  // 배우 추가
+  const addActor = () => {
     if (!newActor.trim()) {
-      alert('배우를 입력하세요.');
+      alert('배우 이름을 입력하세요.');
       return;
     }
-    try {
-      const response = await axios.post(`/survey/${memberId}/actor`, { actor: newActor });
-      alert('선호 배우가 성공적으로 추가되었습니다.');
-      setNewActor('');
-      setMemberData((prevData) => ({
-        ...prevData,
-        preferredActors: [...prevData.preferredActors, response.data],
-      }));
-    } catch (error) {
-      console.error('선호 배우 추가 오류:', error);
-      alert('선호 배우 추가에 실패했습니다.');
+    setActorList([...actorList, newActor]);
+    setNewActor('');
+  };
+
+  // 배우 삭제
+  const removeActor = (index) => {
+    setActorList(actorList.filter((_, i) => i !== index));
+  };
+
+  // 장르 선택/해제
+  const handleGenreChange = (genre) => {
+    if (selectedGenres.includes(genre)) {
+      setSelectedGenres(selectedGenres.filter((item) => item !== genre));
+    } else {
+      setSelectedGenres([...selectedGenres, genre]);
     }
   };
 
-  const handleDeleteActor = async (actor) => {
+  // 설문 데이터 제출
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const surveyData = {
+      preferredGenres: selectedGenres,
+      preferredActors: actorList,
+    };
+
     try {
-      await axios.delete(`/survey/preferred-actors/${actor}`);
-      alert('선호 배우가 성공적으로 삭제되었습니다.');
-      setMemberData((prevData) => ({
-        ...prevData,
-        preferredActors: prevData.preferredActors.filter((a) => a !== actor),
-      }));
+      const token = localStorage.getItem('token');
+      const response = await fetch(`/survey/edit`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(surveyData),
+      });
+
+      if (response.ok) {
+        alert('설문 수정이 완료되었습니다.');
+      } else {
+        alert('설문 수정에 실패했습니다. 다시 시도해주세요.');
+      }
     } catch (error) {
-      console.error('선호 배우 삭제 오류:', error);
-      alert('선호 배우 삭제에 실패했습니다.');
+      console.error('설문 수정 중 오류 발생:', error);
+      alert('오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
     }
   };
+
+  if (loading) {
+    return <div>로딩 중...</div>;
+  }
 
   return (
     <div className="edit-page">
       <h2>회원 정보 수정</h2>
-      <form className="edit-form">
-        <label>
-          비밀번호:
-          <input
-            type="password"
-            name="password"
-            value={memberData.password}
-            onChange={handleChange}
-          />
-          <button type="button" onClick={handlePasswordChange} className="save-button">수정</button>
-        </label>
-        <label>
-          닉네임:
-          <input
-            type="text"
-            name="nickname"
-            value={memberData.nickname}
-            onChange={handleChange}
-          />
-          <button type="button" onClick={handleNicknameChange} className="save-button">수정</button>
-        </label>
-        <label>
-          성별:
-          <select name="gender" value={memberData.gender} onChange={handleChange}>
-            <option value="">선택</option>
-            <option value="M">남성</option>
-            <option value="F">여성</option>
-          </select>
-          <button type="button" onClick={handleGenderChange} className="save-button">수정</button>
-        </label>
-        <label>
-          나이:
-          <input
-            type="number"
-            name="age"
-            value={memberData.age}
-            onChange={handleChange}
-          />
-          <button type="button" onClick={handleAgeChange} className="save-button">수정</button>
-        </label>
+
+      {/* 닉네임 수정 */}
+      <div className="form-group">
+        <label>닉네임</label>
+        <input
+          type="text"
+          value={nickname}
+          onChange={(e) => setNickname(e.target.value)}
+          placeholder="닉네임을 입력하세요"
+        />
+        <button type="button" onClick={handleNicknameChange} className="save-button">수정</button>
+      </div>
+
+      {/* 비밀번호 수정 */}
+      <div className="form-group">
+        <label>비밀번호</label>
+        <input
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          placeholder="비밀번호를 입력하세요"
+        />
+        <button type="button" onClick={handlePasswordChange} className="save-button">수정</button>
+      </div>
+
+      <form className="edit-form" onSubmit={handleSubmit}>
+        {/* 선호 배우 관리 */}
+        <div className="form-group">
+          <label>좋아하는 배우</label>
+          <div className="actor-input-group">
+            <input
+              type="text"
+              value={newActor}
+              onChange={(e) => setNewActor(e.target.value)}
+              placeholder="배우 이름을 입력하세요"
+            />
+            <button type="button" onClick={addActor}>추가</button>
+          </div>
+          <div className="actor-list">
+            {actorList.map((actor, index) => (
+              <div key={index} className="actor-item">
+                {actor}
+                <button type="button" onClick={() => removeActor(index)}>삭제</button>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* 선호 장르 관리 */}
+        <div className="form-group">
+          <label>좋아하는 영화 장르</label>
+          <div className="checkbox-group">
+            {genresList.map((genre, index) => (
+              <div key={index} className="checkbox-item">
+                <input
+                  type="checkbox"
+                  id={`genre-${index}`}
+                  value={genre}
+                  checked={selectedGenres.includes(genre)}
+                  onChange={() => handleGenreChange(genre)}
+                />
+                <label htmlFor={`genre-${index}`}>{genre}</label>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <button type="submit" className="submit-button">수정하기</button>
       </form>
 
-      <div className="genre-section">
-        <h3>선호 장르 관리</h3>
-        <input
-          type="text"
-          value={newGenre}
-          onChange={(e) => setNewGenre(e.target.value)}
-          placeholder="새로운 장르 입력"
-        />
-        <button type="button" onClick={handleAddGenre} className="save-button">추가</button>
-        <ul>
-          {memberData.preferredGenres.map((genre) => (
-            <li key={genre}>
-              {genre} <button onClick={() => handleDeleteGenre(genre)}>삭제</button>
-            </li>
-          ))}
-        </ul>
-      </div>
-
-      <div className="actor-section">
-        <h3>선호 배우 관리</h3>
-        <input
-          type="text"
-          value={newActor}
-          onChange={(e) => setNewActor(e.target.value)}
-          placeholder="새로운 배우 입력"
-        />
-        <button type="button" onClick={handleAddActor} className="save-button">추가</button>
-        <ul>
-          {memberData.preferredActors.map((actor) => (
-            <li key={actor}>
-              {actor} <button onClick={() => handleDeleteActor(actor)}>삭제</button>
-            </li>
-          ))}
-        </ul>
-      </div>
-
-      <button type="button" onClick={handleWithdraw} className="withdraw-button">회원 탈퇴</button>
+      {/* 돌아가기 버튼 */}
+      <button
+        type="button"
+        className="save-button"
+        onClick={() => navigate(-1)} // 이전 페이지로 이동
+      >
+        돌아가기
+      </button>
     </div>
   );
 };

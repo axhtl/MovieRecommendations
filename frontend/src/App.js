@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import StartPage from './components/page/StartPage';
 import Navbar from './components/ui/Navbar';
 import RegisterPage from './components/page/RegisterPage';
@@ -13,6 +13,11 @@ import MovieDetails from './components/list/MovieDetails';
 import ViewPage from './components/page/ViewPage';
 import MemberInfoEdit from './components/list/MemberInfoEdit';
 import RegiMovieDel from './components/list/RegiMovieDel';
+import AdminUsers from './components/admin/AdminUsers';
+import AdminNavbar from './components/ui/AdminNavbar';
+import AdminMovie from './components/admin/AdminMovie';
+import AdminSurvey from './components/admin/AdminSurvey';
+import AdminReports from './components/admin/AdminReports'; 
 
 function App() {
   return (
@@ -55,7 +60,24 @@ function App() {
             </>
           }
         />
-        
+        <Route path="/admin/users" element={<AdminUsers />} />
+        <Route path="/admin/survey" element={<AdminSurvey />} />
+        <Route path="/admin/movie" element={<AdminMovie />} />
+        <Route path="/admin/reports" element={<AdminReports />} />
+        <Route
+          path="/"
+          element={
+            <>
+              <AdminNavbar />
+              <Routes>
+              <Route path="/admin/users" element={<AdminUsers />} />
+              <Route path="/admin/survey" element={<AdminSurvey />} />
+              <Route path="/admin/movie" element={<AdminMovie />} />
+              <Route path="/admin/reports" element={<AdminReports />} />
+              </Routes>
+            </>
+          }
+        />
       </Routes>
     </Router>
   );

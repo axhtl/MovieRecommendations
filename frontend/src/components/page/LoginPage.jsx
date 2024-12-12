@@ -6,7 +6,7 @@ import '../styles/LoginPage.css';
 const LoginPage = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false); // 로딩 상태 추가
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
@@ -17,7 +17,7 @@ const LoginPage = () => {
       return;
     }
 
-    setLoading(true); // 로딩 상태 활성화
+    setLoading(true);
 
     try {
       const response = await axios.post('/member/login', {
@@ -32,14 +32,14 @@ const LoginPage = () => {
 
         // Local Storage에 토큰 및 사용자 정보 저장
         localStorage.setItem('memberId', memberId);
-        localStorage.setItem('role', role); // role 저장
+        localStorage.setItem('role', role);
         localStorage.setItem('token', accessToken);
 
-        // role에 따라 페이지 이동
-        if (role === 'ADMIN') {
-          navigate('/admin/dashboard', { replace: true }); // 관리자 페이지로 이동
+        // 조건에 따라 페이지 이동
+        if (memberId === 14 || role === 'ADMIN') {
+          navigate('/admin/users', { replace: true }); // 관리자 페이지로 이동
         } else {
-          navigate(`/main/${memberId}`, { replace: true }); // 일반 사용자 메인 페이지로 이동
+          navigate(`/main/${memberId}`, { replace: true }); // 일반 사용자 페이지로 이동
         }
       } else {
         alert(message || '로그인 실패. 다시 시도해 주세요.');
@@ -50,7 +50,7 @@ const LoginPage = () => {
         error.response?.data?.message || '로그인 중 문제가 발생했습니다. 다시 시도해 주세요.'
       );
     } finally {
-      setLoading(false); // 로딩 상태 비활성화
+      setLoading(false);
     }
   };
 
@@ -63,14 +63,14 @@ const LoginPage = () => {
           placeholder="아이디"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
-          disabled={loading} // 로딩 중 입력 비활성화
+          disabled={loading}
         />
         <input
           type="password"
           placeholder="비밀번호"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          disabled={loading} // 로딩 중 입력 비활성화
+          disabled={loading}
         />
         <button type="submit" disabled={loading}>
           {loading ? '로그인 중...' : '로그인'}
