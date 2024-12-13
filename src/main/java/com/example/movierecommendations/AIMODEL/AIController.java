@@ -5,6 +5,7 @@ import com.example.movierecommendations.member.service.AuthenticationService;
 import com.example.movierecommendations.member.service.MemberService;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,13 +65,29 @@ public class AIController {
 
     // LLM 모델1을 호출하는 메서드
     @PostMapping("/chatbot/{memberId}")
-    public ResponseEntity<List<Map<String, Object>>> LLMpredict(@PathVariable Long memberId, @RequestBody String inputString) throws JsonProcessingException {
+    public ResponseEntity<List<Map<String, Object>>> LLMpredict(@PathVariable("memberId") Long memberId, @RequestBody String inputString) throws JsonProcessingException {
         log.info("사용자가 입력한 텍스트: {}", inputString);
+        log.info("회원 ID: {}", memberId);  // memberId 명확하게 사용
+
+        // JSON 파싱을 위한 ObjectMapper 생성
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        // inputString을 JsonNode로 변환하여 "text" 값을 추출
+        String inputText = null;
+        try {
+            JsonNode jsonNode = objectMapper.readTree(inputString);
+            inputText = jsonNode.get("text").asText(); // "text" 값을 추출
+            log.info("추출된 텍스트: {}", inputText);
+        } catch (Exception e) {
+            log.error("JSON 파싱 오류", e);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(List.of(Map.of("error", "Invalid JSON format")));
+        }
 
         // LLM 모델을 호출하고 결과를 동기적으로 반환
         try {
             // LLM 모델을 호출하고, 반환 값은 FastAPI로부터 받은 응답
-            List<Map<String, Object>> result = aiModelService.callLLMModel(inputString, memberId);
+            List<Map<String, Object>> result = aiModelService.callLLMModel(inputText, memberId);
 
             // 결과가 제대로 온 경우, 적절한 응답 포맷으로 변환
             if (result != null && !result.isEmpty()) {
@@ -93,13 +110,29 @@ public class AIController {
 
     // LLM 모델2을 호출하는 메서드
     @PostMapping("/chatbot/llm/reason/{movieCd}")
-    public ResponseEntity<List<Map<String, Object>>> LLMReasonpredict(@PathVariable Long movieCd, @RequestBody String inputString) throws JsonProcessingException {
+    public ResponseEntity<List<Map<String, Object>>> LLMReasonpredict(@PathVariable("movieCd") Long movieCd, @RequestBody String inputString) throws JsonProcessingException {
         log.info("사용자가 입력한 텍스트: {}", inputString);
+        log.info("영화 CD: {}", movieCd);  // movieCd 명확하게 사용
+
+        // JSON 파싱을 위한 ObjectMapper 생성
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        // inputString을 JsonNode로 변환하여 "text" 값을 추출
+        String inputText = null;
+        try {
+            JsonNode jsonNode = objectMapper.readTree(inputString);
+            inputText = jsonNode.get("text").asText(); // "text" 값을 추출
+            log.info("추출된 텍스트: {}", inputText);
+        } catch (Exception e) {
+            log.error("JSON 파싱 오류", e);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(List.of(Map.of("error", "Invalid JSON format")));
+        }
 
         // LLM 모델을 호출하고 결과를 동기적으로 반환
         try {
             // LLM 모델을 호출하고, 반환 값은 FastAPI로부터 받은 응답
-            List<Map<String, Object>> result = aiModelService.callLLMReasonModel(inputString, movieCd);
+            List<Map<String, Object>> result = aiModelService.callLLMReasonModel(inputText, movieCd);
 
             // 결과가 제대로 온 경우, 적절한 응답 포맷으로 변환
             if (result != null && !result.isEmpty()) {

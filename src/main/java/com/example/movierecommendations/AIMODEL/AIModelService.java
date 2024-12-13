@@ -83,6 +83,7 @@ public class AIModelService {
 
         // 입력 데이터를 JSON 형태로 변경
         String requestBody = String.format("{\"text\": \"%s\"}", inputData);
+        logger.info("Sending RequestBody to ai-server : {}", requestBody);
 
         // 동기 방식으로 FastAPI 호출
         List<Map<String, Object>> result = webClientWithTimeout.post()
@@ -122,6 +123,7 @@ public class AIModelService {
 
         // 입력 데이터를 JSON 형태로 변경
         String requestBody = String.format("{\"text\": \"%s\"}", inputData);
+        logger.info("Sending RequestBody to ai-server : {}", requestBody);
 
         // 동기 방식으로 FastAPI 호출
         List<Map<String, Object>> result = webClientWithTimeout.post()
