@@ -18,6 +18,7 @@ import AdminNavbar from './components/ui/AdminNavbar';
 import AdminMovie from './components/admin/AdminMovie';
 import AdminSurvey from './components/admin/AdminSurvey';
 import AdminReports from './components/admin/AdminReports'; 
+import Chatbot from './components/list/Chatbot';
 
 function App() {
   return (
@@ -38,6 +39,7 @@ function App() {
         <Route path="/movie/search" element={<SearchPage />} />
         <Route path="/api/movies/detail/:movieId" element={<MovieDetails />} />
         <Route path="/movie/view" element={<ViewPage />} />
+        <Route path="/api/ai/chatbot/:memberId" element={<Chatbot isOpen={true}/>}/>
         <Route path="/edit/:memberId" element={<MemberInfoEdit />} />
         <Route path="/movies/:movieId" element={<RegiMovieDel />} />
         
@@ -55,6 +57,7 @@ function App() {
                 <Route path="/api/movies/detail/:movieId" element={<MovieDetails />} />
                 <Route path="/movie/view" element={<ViewPage />} />
                 <Route path="/edit/:memberId" element={<MemberInfoEdit />} />
+                <Route path="/api/ai/chatbot/:memberId" element={<Chatbot isOpen={true}/>}/>
                 <Route path="/movies/:movieId" element={<RegiMovieDel />} />
               </Routes>
             </>

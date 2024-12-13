@@ -13,7 +13,7 @@ function AdminMovie() {
     const token = localStorage.getItem('token');
 
     // 관리자 권한 확인
-    if (!memberId || memberId !== '14' || !token) {
+    if (!memberId || memberId !== '1' || !token) {
       alert('접근 권한이 없습니다.');
       navigate('/');
       return; // navigate 이후 불필요한 코드 실행 방지

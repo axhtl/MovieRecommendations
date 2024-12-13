@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import '../styles/Chatbot.css'; // 필요한 스타일 파일 추가
+import '../styles/Chatbot.css';
 
 const Chatbot = ({ isOpen, onClose }) => {
   const [messages, setMessages] = useState([]); // 대화 내역
@@ -9,9 +9,12 @@ const Chatbot = ({ isOpen, onClose }) => {
   const userProfile = 'https://via.placeholder.com/40?text=U'; // 사용자 프로필 이미지
   const aiProfile = 'https://via.placeholder.com/40?text=AI'; // AI 프로필 이미지
 
-  // 메시지 전송 처리 (AI 응답 활성화)
+  // 메시지 전송 처리
   const handleSend = async () => {
-    if (!input.trim()) return; // 빈 메시지 처리
+    if (!input.trim()) {
+      alert('메시지를 입력해주세요.');
+      return;
+    }
 
     const timestamp = new Date().toLocaleTimeString(); // 현재 시간
     const userMessage = {
@@ -22,36 +25,41 @@ const Chatbot = ({ isOpen, onClose }) => {
       profile: userProfile,
     };
 
-    // 사용자 메시지 추가
     setMessages((prev) => [...prev, userMessage]);
 
     try {
-      // API 요청 보내기
-      const response = await fetch('http://127.0.0.1:8086/llm', {
+      const token = localStorage.getItem('token'); // 토큰 가져오기
+      if (!token) {
+        throw new Error('로그인이 필요합니다. 토큰이 없습니다.');
+      }
+
+      const response = await fetch('/api/ai/chatbot', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: input }),
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`, // 토큰 추가
+        },
+        body: JSON.stringify({ text: input }), // 요청 본문에 입력된 텍스트 추가
       });
 
       if (!response.ok) {
-        throw new Error('네트워크 응답에 문제가 있습니다.');
+        throw new Error(`HTTP 상태 코드: ${response.status}`);
       }
 
       const data = await response.json();
+
       const aiMessage = {
         sender: 'ai',
-        text: data.llm_response,
+        text: data[0]?.llm_response || data.llm_response || 'AI 응답 없음',
         time: new Date().toLocaleTimeString(),
         name: aiName,
         profile: aiProfile,
       };
 
-      // AI 메시지 추가
       setMessages((prev) => [...prev, aiMessage]);
     } catch (error) {
       console.error('AI 응답 처리 중 오류 발생:', error);
 
-      // 에러 메시지 추가
       const errorMessage = {
         sender: 'ai',
         text: 'AI 응답 처리에 실패했습니다. 나중에 다시 시도해 주세요.',

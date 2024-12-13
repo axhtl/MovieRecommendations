@@ -5,11 +5,11 @@
     flex-direction: column;
     align-items: center;
     background-color: #f0f0f0;
-    height: 100vh;
+    min-height: 100vh; /* 최소 높이 설정 */
     padding-top: 60px;
-}
-
-.recommend-content {
+  }
+  
+  .recommend-content {
     width: 80%;
     max-width: 1200px;
     background: #fff;
@@ -17,63 +17,123 @@
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     margin-top: 20px;
-}
-
-.recommend-content h2 {
+  }
+  
+  .recommend-content h2 {
     margin-bottom: 30px;
     color: #333;
     text-align: center;
-}
-
-.movie-list {
+  }
+  
+  .movie-list {
     display: flex;
     justify-content: space-between;
     flex-wrap: wrap;
     gap: 20px;
-}
-
-.movie-item {
+  }
+  
+  .movie-item {
     width: 180px;
     text-align: center;
     background: #f9f9f9;
     padding: 15px;
     border-radius: 10px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.movie-item img {
+    transition: transform 0.2s ease; /* 호버 시 부드러운 애니메이션 */
+  }
+  
+  .movie-item:hover {
+    transform: scale(1.03); /* 호버 시 확대 효과를 줄임 */
+  }
+  
+  .movie-item img {
     width: 100%;
     height: auto;
     border-radius: 5px;
     margin-bottom: 10px;
-}
-
-.movie-item p {
+  }
+  
+  .movie-item p {
     color: #333;
-    font-size: 16px;
+    font-size: 14px;
     margin-bottom: 10px;
-}
-
-/* 챗봇 버튼 */
-.chatbot-button {
+  }
+  
+  /* 영화 이유 컨테이너 */
+  .movie-reason {
+    max-height: 100px;
+    overflow: hidden;
+    text-align: left;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background: #fff;
+    font-size: 14px;
+  }
+  
+  /* 긴 내용 스크롤 가능 */
+  .movie-reason-expanded {
+    max-height: 100px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    background-color: #f9f9f9;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+  }
+  
+  .scrollable-content {
+    white-space: nowrap; /* 텍스트를 한 줄로 유지 */
+  }
+  
+  .reason-button {
+    background-color: #333;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+  
+  .reason-button:hover {
+    background-color: #555;
+  }
+  
+  .close-button {
+    background-color: #333;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+  
+  .close-button:hover {
+    background-color: #555;
+  }
+  
+  /* 챗봇 버튼 */
+  .chatbot-button {
     position: fixed;
     bottom: 30px;
     right: 30px;
     width: 60px;
     height: 60px;
-    background-color: #333; /* 녹색 버튼 */
+    background-color: #333;
     border: none;
     border-radius: 50%;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5); /* 더 강한 그림자 */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
     color: white;
     font-size: 24px;
     cursor: pointer;
-    transition: transform 0.3s, box-shadow 0.3s;
+    transition: transform 0.2s ease, box-shadow 0.2s ease; /* 호버 효과 완화 */
   }
   
   .chatbot-button:hover {
-    transform: scale(1.1); /* 호버 시 확대 */
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.7); /* 호버 시 그림자 강조 */
+    transform: scale(1.05); /* 확대 효과 줄임 */
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4); /* 그림자 효과 줄임 */
   }
   
   /* 에러 메시지 */
@@ -82,4 +142,47 @@
     text-align: center;
     margin-top: 20px;
   }
-
+  
+  /* Modal for showing recommendation reason */
+.reason-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+  
+  .modal-content {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    width: 500px;
+    max-height: 400px;
+    overflow-y: auto;
+    text-align: center;
+  }
+  
+  .modal-content p {
+    margin-bottom: 20px;
+    font-size: 16px;
+    line-height: 1.5;
+  }
+  
+  .close-button {
+    background-color: #333;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .close-button:hover {
+    background-color: #555;
+  }
+  

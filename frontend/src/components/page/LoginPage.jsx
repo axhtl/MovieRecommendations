@@ -36,7 +36,7 @@ const LoginPage = () => {
         localStorage.setItem('token', accessToken);
 
         // 조건에 따라 페이지 이동
-        if (memberId === 14 || role === 'ADMIN') {
+        if (memberId === 1 || role === 'ADMIN') {
           navigate('/admin/users', { replace: true }); // 관리자 페이지로 이동
         } else {
           navigate(`/main/${memberId}`, { replace: true }); // 일반 사용자 페이지로 이동

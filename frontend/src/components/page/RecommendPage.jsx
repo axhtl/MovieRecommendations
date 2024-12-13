@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Navbar from '../ui/Navbar';
-import Chatbot from '../list/Chatbot'; // 새롭게 만든 Chatbot 컴포넌트
+import Chatbot from '../list/Chatbot';
 import '../styles/RecommendPage.css';
 import '../styles/Chatbot.css';
 
@@ -12,100 +12,127 @@ const RecommendPage = () => {
   const [nickname, setNickname] = useState('');
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
-
-  // 채팅창 상태
+  const [selectedReason, setSelectedReason] = useState(null);
   const [chatOpen, setChatOpen] = useState(false);
 
-  useEffect(() => {
-    const fetchNicknameAndRecommendations = async () => {
-      const accessToken = localStorage.getItem('token'); // 토큰 받아오기
+  const fetchRecommendationReason = async (movieCd) => {
+    const token = localStorage.getItem('token');
+    try {
+      const response = await fetch(`/api/ai/chatbot/llm/reason/${movieCd}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ text: `${movieCd}` }),
+      });
 
-      if (!userId || !accessToken) {
-        setError('로그인이 필요합니다.');
-        setLoading(false);
-        return;
+      if (!response.ok) {
+        console.error(`추천 이유 요청 실패: ${response.status}`);
+        return '추천 이유를 가져올 수 없습니다.';
       }
 
-      try {
-        // 닉네임 가져오기
-        const nicknameResponse = await fetch(`/member/user/${userId}`, {
-          headers: {
-            Authorization: `Bearer ${accessToken}`, // 토큰 추가
-          },
-        });
+      const data = await response.json();
+      return data.llm_response || '추천 이유 없음';
+    } catch (error) {
+      console.error(`추천 이유 요청 중 오류 발생: ${error}`);
+      return '추천 이유를 가져올 수 없습니다.';
+    }
+  };
 
-        if (!nicknameResponse.ok) {
-          const errorMessage = await nicknameResponse.text();
-          throw new Error(`닉네임 요청 실패: ${errorMessage}`);
-        }
+  const fetchNicknameAndRecommendations = async () => {
+    const accessToken = localStorage.getItem('token');
 
-        const nicknameData = await nicknameResponse.json();
-        setNickname(nicknameData.member?.nickname || '');
+    if (!userId || !accessToken) {
+      setError('로그인이 필요합니다.');
+      setLoading(false);
+      return;
+    }
 
-        // 추천 영화 가져오기
-        const recommendationsResponse = await fetch(`/api/ai/predict/${userId}`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${accessToken}`, // 토큰 추가
-          },
-        });
+    try {
+      const nicknameResponse = await fetch(`/member/user/${userId}`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
 
-        if (!recommendationsResponse.ok) {
-          const errorMessage = await recommendationsResponse.text();
-          throw new Error(`추천 요청 실패: ${errorMessage}`);
-        }
+      if (!nicknameResponse.ok) {
+        throw new Error('닉네임 요청 실패');
+      }
 
-        const recommendationsData = await recommendationsResponse.json();
+      const nicknameData = await nicknameResponse.json();
+      setNickname(nicknameData.member?.nickname || '');
 
-        // movieCd 기반 상세 영화 데이터 가져오기
-        const movies = await Promise.all(
-          recommendationsData.map(async (movie) => {
-            try {
-              const detailResponse = await fetch(
-                `/api/movies/detail/${movie.movieCd}?language=ko`,
-                {
-                  headers: {
-                    Authorization: `Bearer ${accessToken}`, // 토큰 추가
-                  },
-                }
-              );
+      const recommendationsResponse = await fetch(`/api/ai/predict/${userId}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
 
-              if (!detailResponse.ok) {
-                console.error(`영화 상세 정보 요청 실패: ${movie.movieCd}`);
-                return null;
+      if (!recommendationsResponse.ok) {
+        throw new Error('추천 요청 실패');
+      }
+
+      const recommendationsData = await recommendationsResponse.json();
+
+      const movies = await Promise.all(
+        recommendationsData.map(async (movie) => {
+          try {
+            const detailResponse = await fetch(
+              `/api/movies/detail/${movie.movieCd}?language=ko`,
+              {
+                headers: {
+                  Authorization: `Bearer ${accessToken}`,
+                },
               }
+            );
 
-              const detailData = await detailResponse.json();
-              return {
-                id: movie.movieCd,
-                title: detailData.title,
-                posterPath: detailData.poster_path
-                  ? `https://image.tmdb.org/t/p/w500${detailData.poster_path}`
-                  : null,
-              };
-            } catch (error) {
-              console.error(`영화 상세 정보 요청 중 오류 발생: ${movie.movieCd}`, error);
+            if (!detailResponse.ok) {
               return null;
             }
-          })
-        );
 
-        setRecommendations(movies.filter((movie) => movie !== null)); // 유효한 데이터만 추가
-      } catch (error) {
-        console.error('Error:', error.message);
-        setError(error.message);
-      } finally {
-        setLoading(false);
-      }
-    };
+            const detailData = await detailResponse.json();
+            const reason = await fetchRecommendationReason(movie.movieCd);
 
-    fetchNicknameAndRecommendations();
-  }, [userId]);
+            return {
+              id: movie.movieCd,
+              title: detailData.title,
+              posterPath: detailData.poster_path
+                ? `https://image.tmdb.org/t/p/w500${detailData.poster_path}`
+                : null,
+              reason,
+            };
+          } catch (error) {
+            return null;
+          }
+        })
+      );
+
+      setRecommendations(movies.filter((movie) => movie !== null));
+    } catch (error) {
+      setError(error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleMovieClick = (movieId) => {
     navigate(`/api/movies/detail/${movieId}?language=ko`);
   };
+
+  const openReasonModal = (reason) => {
+    setSelectedReason(reason);
+  };
+
+  const closeReasonModal = () => {
+    setSelectedReason(null);
+  };
+
+  useEffect(() => {
+    fetchNicknameAndRecommendations();
+  }, [userId]);
 
   if (loading) {
     return (
@@ -128,38 +155,53 @@ const RecommendPage = () => {
         ) : (
           <div className="movie-list">
             {recommendations.map((movie) => (
-              <div
-                className="movie-item"
-                key={movie.id}
-                onClick={() => handleMovieClick(movie.id)} // 클릭 이벤트 추가
-              >
-                {movie.posterPath ? (
-                  <img
-                    src={movie.posterPath}
-                    alt={movie.title}
-                    className="movie-poster"
-                  />
-                ) : (
-                  <div className="no-poster">포스터 없음</div>
-                )}
-                <h3 className="movie-title">{movie.title}</h3>
+              <div className="movie-item" key={movie.id}>
+                <div onClick={() => handleMovieClick(movie.id)}>
+                  {movie.posterPath ? (
+                    <img
+                      src={movie.posterPath}
+                      alt={movie.title}
+                      className="movie-poster"
+                    />
+                  ) : (
+                    <div className="no-poster">포스터 없음</div>
+                  )}
+                  <h3 className="movie-title">{movie.title}</h3>
+                </div>
+                <button
+                  className="reason-button"
+                  onClick={() => openReasonModal(movie.reason)}
+                >
+                  추천 이유 보기
+                </button>
               </div>
             ))}
           </div>
         )}
       </div>
 
-      {/* 챗봇 버튼 */}
+      {selectedReason && (
+        <div className="reason-modal">
+          <div className="modal-content">
+            <p>{selectedReason}</p>
+            <button className="close-button" onClick={closeReasonModal}>
+              닫기
+            </button>
+          </div>
+        </div>
+      )}
+
       <button
         className="chatbot-button"
         aria-label="챗봇 열기"
-        onClick={() => setChatOpen(!chatOpen)}
+        onClick={() => setChatOpen(true)}
       >
         💬
       </button>
 
-      {/* Chatbot 컴포넌트 */}
-      <Chatbot isOpen={chatOpen} onClose={() => setChatOpen(false)} />
+      {chatOpen && (
+        <Chatbot isOpen={chatOpen} onClose={() => setChatOpen(false)} />
+      )}
     </div>
   );
 };

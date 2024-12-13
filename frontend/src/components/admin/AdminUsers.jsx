@@ -12,7 +12,7 @@ function AdminUsers() {
     const memberId = localStorage.getItem('memberId');
     const token = localStorage.getItem('token');
 
-    if (!memberId || memberId !== '14' || !token) {
+    if (!memberId || memberId !== '1' || !token) {
       alert('접근 권한이 없습니다.');
       navigate('/');
     }
