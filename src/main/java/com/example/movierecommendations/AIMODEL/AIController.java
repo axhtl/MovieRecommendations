@@ -62,16 +62,55 @@ public class AIController {
     }
 
 
-    // HRM 모델을 호출하는 메서드
+    // LLM 모델1을 호출하는 메서드
     @PostMapping("/chatbot/{memberId}")
     public ResponseEntity<List<Map<String, Object>>> LLMpredict(@PathVariable Long memberId, @RequestBody String inputString) throws JsonProcessingException {
-        log.info("사용자가 입력한 테스트:{}", inputString);
+        log.info("사용자가 입력한 텍스트: {}", inputString);
+
+        // LLM 모델을 호출하고 결과를 동기적으로 반환
+        try {
+            // LLM 모델을 호출하고, 반환 값은 FastAPI로부터 받은 응답
+            List<Map<String, Object>> result = aiModelService.callLLMModel(inputString, memberId);
+
+            // 결과가 제대로 온 경우, 적절한 응답 포맷으로 변환
+            if (result != null && !result.isEmpty()) {
+                // FastAPI의 응답에서 "llm_response" 값을 가져오기
+                String llmResponse = (String) result.get(0).get("llm_response");
+                List<Map<String, Object>> response = List.of(Map.of("llm_response", llmResponse));
+                return ResponseEntity.ok(response);
+            } else {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body(List.of(Map.of("error", "Failed to get valid response from LLM")));
+            }
+        } catch (Exception ex) {
+            // 예외 처리: 에러가 발생한 경우
+            log.error("Error calling LLM model", ex);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(List.of(Map.of("error", "Error occurred while processing the recommendation")));
+        }
+    }
+
+
+    // LLM 모델2을 호출하는 메서드
+    @PostMapping("/chatbot/llm/reason/{memberId}")
+    public ResponseEntity<List<Map<String, Object>>> LLMReasonpredict(@PathVariable Long memberId, @RequestBody String inputString) throws JsonProcessingException {
+        log.info("사용자가 입력한 텍스트: {}", inputString);
 
         // HRM 모델을 호출하고 결과를 동기적으로 반환
         try {
-            List<Map<String, Object>> result = aiModelService.callLLMModel(inputString, memberId);
-            // 추천 결과가 성공적으로 처리된 후, 클라이언트에게 추천 결과를 JSON 형태로 반환
-            return ResponseEntity.ok(result);  // List<Map<String, Object>> 형태로 반환
+            // LLM 모델을 호출하고, 반환 값은 FastAPI로부터 받은 응답
+            List<Map<String, Object>> result = aiModelService.callLLMReasonModel(inputString, memberId);
+
+            // 결과가 제대로 온 경우, 적절한 응답 포맷으로 변환
+            if (result != null && !result.isEmpty()) {
+                // FastAPI의 응답에서 "llm_response" 값을 가져오기
+                String llmResponse = (String) result.get(0).get("llm_response");
+                List<Map<String, Object>> response = List.of(Map.of("llm_response", llmResponse));
+                return ResponseEntity.ok(response);
+            } else {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body(List.of(Map.of("error", "Failed to get valid response from LLM")));
+            }
         } catch (Exception ex) {
             // 예외 처리: 에러가 발생한 경우
             log.error("Error calling LLM model", ex);
