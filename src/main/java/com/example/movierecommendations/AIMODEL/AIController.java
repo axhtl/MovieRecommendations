@@ -96,7 +96,7 @@ public class AIController {
     public ResponseEntity<List<Map<String, Object>>> LLMReasonpredict(@PathVariable Long memberId, @RequestBody String inputString) throws JsonProcessingException {
         log.info("사용자가 입력한 텍스트: {}", inputString);
 
-        // HRM 모델을 호출하고 결과를 동기적으로 반환
+        // LLM 모델을 호출하고 결과를 동기적으로 반환
         try {
             // LLM 모델을 호출하고, 반환 값은 FastAPI로부터 받은 응답
             List<Map<String, Object>> result = aiModelService.callLLMReasonModel(inputString, memberId);
@@ -109,11 +109,11 @@ public class AIController {
                 return ResponseEntity.ok(response);
             } else {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                        .body(List.of(Map.of("error", "Failed to get valid response from LLM")));
+                        .body(List.of(Map.of("error", "Failed to get valid response from LLM-Reason")));
             }
         } catch (Exception ex) {
             // 예외 처리: 에러가 발생한 경우
-            log.error("Error calling LLM model", ex);
+            log.error("Error calling LLM-Reason model", ex);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(List.of(Map.of("error", "Error occurred while processing the recommendation")));
         }

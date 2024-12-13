@@ -125,7 +125,7 @@ public class AIModelService {
 
         // 동기 방식으로 FastAPI 호출
         List<Map<String, Object>> result = webClientWithTimeout.post()
-                .uri("/llm")  // FastAPI에서 받는 경로
+                .uri("/llm-reason")  // FastAPI에서 받는 경로
                 .contentType(MediaType.APPLICATION_JSON)  // Content-Type을 application/json으로 설정
                 .bodyValue(requestBody)  // 요청 본문에 JSON 형태로 데이터를 담아 보냄
                 .retrieve()
@@ -136,12 +136,12 @@ public class AIModelService {
                 .block();  // 동기적으로 처리하도록 block() 호출
 
         if (result != null && !result.isEmpty()) {
-            logger.info("Received LLM recommendations: {}", result);
+            logger.info("Received LLM-Reason recommendations: {}", result);
         } else {
-            logger.error("Failed to receive a valid response from the LLM model.");
+            logger.error("Failed to receive a valid response from the LLM-Reason model.");
         }
 
-        return result != null ? result : List.of(Map.of("error", "Error occurred while calling LLM model"));
+        return result != null ? result : List.of(Map.of("error", "Error occurred while calling LLM-Reason model"));
     }
 
 
