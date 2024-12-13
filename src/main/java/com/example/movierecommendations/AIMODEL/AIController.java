@@ -62,12 +62,10 @@ public class AIController {
         }
     }
 
-
     // LLM 모델1을 호출하는 메서드
-    @PostMapping("/chatbot/{memberId}")
-    public ResponseEntity<List<Map<String, Object>>> LLMpredict(@PathVariable("memberId") Long memberId, @RequestBody String inputString) throws JsonProcessingException {
+    @PostMapping("/chatbot")
+    public ResponseEntity<Map<String, Object>> LLMpredict(@RequestBody String inputString) throws JsonProcessingException {
         log.info("사용자가 입력한 텍스트: {}", inputString);
-        log.info("회원 ID: {}", memberId);  // memberId 명확하게 사용
 
         // JSON 파싱을 위한 ObjectMapper 생성
         ObjectMapper objectMapper = new ObjectMapper();
@@ -81,76 +79,55 @@ public class AIController {
         } catch (Exception e) {
             log.error("JSON 파싱 오류", e);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(List.of(Map.of("error", "Invalid JSON format")));
+                    .body(Map.of("error", "Invalid JSON format"));
         }
 
         // LLM 모델을 호출하고 결과를 동기적으로 반환
         try {
             // LLM 모델을 호출하고, 반환 값은 FastAPI로부터 받은 응답
-            List<Map<String, Object>> result = aiModelService.callLLMModel(inputText, memberId);
+            Map<String, Object> result = aiModelService.callLLMModel(inputText);
 
             // 결과가 제대로 온 경우, 적절한 응답 포맷으로 변환
             if (result != null && !result.isEmpty()) {
-                // FastAPI의 응답에서 "llm_response" 값을 가져오기
-                String llmResponse = (String) result.get(0).get("llm_response");
-                List<Map<String, Object>> response = List.of(Map.of("llm_response", llmResponse));
-                return ResponseEntity.ok(response);
+                return ResponseEntity.ok(result);
             } else {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                        .body(List.of(Map.of("error", "Failed to get valid response from LLM")));
+                        .body(Map.of("error", "Failed to get valid response from LLM"));
             }
         } catch (Exception ex) {
             // 예외 처리: 에러가 발생한 경우
             log.error("Error calling LLM model", ex);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(List.of(Map.of("error", "Error occurred while processing the recommendation")));
+                    .body(Map.of("error", "Error occurred while processing the recommendation"));
         }
     }
 
 
     // LLM 모델2을 호출하는 메서드
     @PostMapping("/chatbot/llm/reason/{movieCd}")
-    public ResponseEntity<List<Map<String, Object>>> LLMReasonpredict(@PathVariable("movieCd") Long movieCd, @RequestBody String inputString) throws JsonProcessingException {
-        log.info("사용자가 입력한 텍스트: {}", inputString);
-        log.info("영화 CD: {}", movieCd);  // movieCd 명확하게 사용
-
-        // JSON 파싱을 위한 ObjectMapper 생성
-        ObjectMapper objectMapper = new ObjectMapper();
-
-        // inputString을 JsonNode로 변환하여 "text" 값을 추출
-        String inputText = null;
-        try {
-            JsonNode jsonNode = objectMapper.readTree(inputString);
-            inputText = jsonNode.get("text").asText(); // "text" 값을 추출
-            log.info("추출된 텍스트: {}", inputText);
-        } catch (Exception e) {
-            log.error("JSON 파싱 오류", e);
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(List.of(Map.of("error", "Invalid JSON format")));
-        }
+    public ResponseEntity<Map<String, Object>> LLMReasonpredict(@PathVariable("movieCd") Long movieCd) throws JsonProcessingException {
+        log.info("사용자가 입력한 텍스트 영화 CD: {}", movieCd); // movieCd 명확하게 사용
 
         // LLM 모델을 호출하고 결과를 동기적으로 반환
         try {
             // LLM 모델을 호출하고, 반환 값은 FastAPI로부터 받은 응답
-            List<Map<String, Object>> result = aiModelService.callLLMReasonModel(inputText, movieCd);
+            Map<String, Object> result = aiModelService.callLLMReasonModel(String.valueOf(movieCd));
 
             // 결과가 제대로 온 경우, 적절한 응답 포맷으로 변환
             if (result != null && !result.isEmpty()) {
-                // FastAPI의 응답에서 "llm_response" 값을 가져오기
-                String llmResponse = (String) result.get(0).get("llm_response");
-                List<Map<String, Object>> response = List.of(Map.of("llm_response", llmResponse));
-                return ResponseEntity.ok(response);
+                return ResponseEntity.ok(result);
             } else {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                        .body(List.of(Map.of("error", "Failed to get valid response from LLM-Reason")));
+                        .body(Map.of("error", "Failed to get valid response from LLM-Reason"));
             }
         } catch (Exception ex) {
             // 예외 처리: 에러가 발생한 경우
-            log.error("Error calling LLM-Reason model", ex);
+            log.error("Error calling LLM-Reason model with movieCd: {} ", movieCd, ex);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(List.of(Map.of("error", "Error occurred while processing the recommendation")));
+                    .body(Map.of("error", "Error occurred while processing the recommendation"));
         }
     }
+
 
 
 }
