@@ -108,7 +108,7 @@ public class AIModelService {
 
 
     // FastAPI에서 추천 결과를 받아오는 메서드
-    public List<Map<String, Object>> callLLMReasonModel(String inputData, Long memberId) {
+    public List<Map<String, Object>> callLLMReasonModel(String inputData, Long movieCd) {
         logger.info("Calling FastAPI LLM model with input data: {}", inputData);
 
         // WebClient에 30초 타임아웃 설정

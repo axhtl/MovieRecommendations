@@ -92,14 +92,14 @@ public class AIController {
 
 
     // LLM 모델2을 호출하는 메서드
-    @PostMapping("/chatbot/llm/reason/{memberId}")
-    public ResponseEntity<List<Map<String, Object>>> LLMReasonpredict(@PathVariable Long memberId, @RequestBody String inputString) throws JsonProcessingException {
+    @PostMapping("/chatbot/llm/reason/{movieCd}")
+    public ResponseEntity<List<Map<String, Object>>> LLMReasonpredict(@PathVariable Long movieCd, @RequestBody String inputString) throws JsonProcessingException {
         log.info("사용자가 입력한 텍스트: {}", inputString);
 
         // LLM 모델을 호출하고 결과를 동기적으로 반환
         try {
             // LLM 모델을 호출하고, 반환 값은 FastAPI로부터 받은 응답
-            List<Map<String, Object>> result = aiModelService.callLLMReasonModel(inputString, memberId);
+            List<Map<String, Object>> result = aiModelService.callLLMReasonModel(inputString, movieCd);
 
             // 결과가 제대로 온 경우, 적절한 응답 포맷으로 변환
             if (result != null && !result.isEmpty()) {
