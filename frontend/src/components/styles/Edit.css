@@ -2,156 +2,99 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 40px;
-  background-color: #f0f0f0;
+  padding: 20px;
+  background-color: #f8f8f8;
   min-height: 100vh;
 }
 
-/* 회원 정보 수정 폼 스타일 */
-.edit-page .edit-form {
-  width: 100%;
-  max-width: 500px;
-  background: #fff;
-  padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+.edit-title {
+  font-size: 1.5rem;
+  font-weight: bold;
   margin-bottom: 20px;
 }
 
-/* 각 라벨 스타일 */
-.edit-page label {
+.form-section {
+  margin-bottom: 20px;
+  width: 100%;
+  max-width: 400px;
+}
+
+.form-label {
+  font-size: 1rem;
+  margin-bottom: 8px;
   display: block;
-  margin-bottom: 15px;
   font-weight: bold;
 }
 
-/* 입력 필드 스타일 */
-.edit-page input[type="text"],
-.edit-page input[type="password"],
-.edit-page input[type="number"],
-.edit-page select {
-  width: calc(100% - 20px);
-  padding: 8px;
-  margin-top: 5px;
-  margin-bottom: 10px;
-  border-radius: 5px;
-  border: 1px solid #ccc;
-  font-size: 16px;
-}
-
-/* 버튼 스타일 */
-.edit-page .save-button {
-  padding: 10px 20px;
-  background-color: #333;
-  color: #fff;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  margin-top: 10px;
-  transition: background-color 0.3s;
-}
-
-.edit-page .save-button:hover {
-  background-color: #555;
-}
-
-/* 회원 탈퇴 버튼 스타일 */
-.edit-page .withdraw-button {
-  padding: 10px 20px;
-  background-color: #e74c3c;
-  color: #fff;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-  margin-top: 20px;
-}
-
-.edit-page .withdraw-button:hover {
-  background-color: #c0392b;
-}
-
-/* 선호 장르와 배우 관리 섹션 스타일 */
-.edit-page .genre-section,
-.edit-page .actor-section {
-  width: 100%;
-  max-width: 500px;
-  background: #fff;
-  padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  margin-bottom: 20px;
-}
-
-.edit-page .genre-section h3,
-.edit-page .actor-section h3 {
-  margin-bottom: 15px;
-  color: #333;
-}
-
-.edit-page .genre-section input,
-.edit-page .actor-section input {
-  width: calc(100% - 20px);
-  padding: 8px;
-  margin-bottom: 10px;
-  border-radius: 5px;
-  border: 1px solid #ccc;
-  font-size: 16px;
-}
-
-/* 목록 아이템 스타일 */
-.edit-page ul {
-  list-style: none;
-  padding: 0;
-}
-
-.edit-page ul li {
+.input-group {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  background: #f9f9f9;
-  padding: 10px;
-  border-radius: 5px;
-  margin-bottom: 10px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.edit-page ul li button {
-  background-color: #e74c3c;
-  color: #fff;
-  border: none;
-  padding: 5px 10px;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-
-.edit-page ul li button:hover {
-  background-color: #c0392b;
-}
-
-/* 장르 추가 섹션 스타일 */
-.edit-page .genre-input-group {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 15px;
-}
-
-.edit-page .genre-input-group input {
+.form-input {
   flex: 1;
+  padding: 8px;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
   margin-right: 10px;
 }
 
-.edit-page .genre-input-group button {
-  padding: 10px;
-  background-color: #333;
-  color: white;
+.form-button {
+  padding: 8px 16px;
+  font-size: 0.9rem;
   border: none;
-  border-radius: 5px;
+  background-color: #333;
+  color: #fff;
+  border-radius: 4px;
   cursor: pointer;
   transition: background-color 0.3s;
 }
 
-.edit-page .genre-input-group button:hover {
+.form-button:hover {
   background-color: #555;
+}
+
+.back-button {
+  padding: 10px 20px;
+  font-size: 1rem;
+  border: none;
+  background-color: #333;
+  color: #fff;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: 20px;
+  transition: background-color 0.3s;
+}
+
+.back-button:hover {
+  background-color: #555;
+}
+/* 공통 리스트 스타일 */
+.genre-list, .actor-list {
+  margin-top: 10px;
+}
+
+.genre-item, .actor-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px;
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  margin-bottom: 5px;
+}
+
+.genre-item button, .actor-item button {
+  background-color: #f9f9f9;
+  color: #333;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.genre-item button:hover, .actor-item button:hover {
+  background-color: #f9f9f9;
 }

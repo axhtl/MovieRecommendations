@@ -14,21 +14,21 @@ const MemberInfo = ({ member, survey, preferredGenres, preferredActors })=> {
       <div className="member-card">
         <h3>{member.nickname} 님의 정보</h3>
         <p><strong>ID:</strong> {member.membername}</p>
-        <p><strong>선호 장르:</strong>
-        <ul className="genre-list">
-          {preferredGenres && preferredGenres.length > 0 ? (
-            preferredGenres.map((genre, index) => <li key={index}>{genre}</li>)
-          ) : (
-            <li>선호 장르가 없습니다.</li>
-          )}
-        </ul>
-        </p>
         <p><strong>선호 배우:</strong>
         <ul className="actor-list">
           {preferredActors && preferredActors.length > 0 ? (
             preferredActors.map((actor, index) => <li key={index}>{actor}</li>)
           ) : (
             <li>선호 배우가 없습니다.</li>
+          )}
+        </ul>
+        </p>
+        <p><strong>선호 장르:</strong>
+        <ul className="genre-list">
+          {preferredGenres && preferredGenres.length > 0 ? (
+            preferredGenres.map((genre, index) => <li key={index}>{genre}</li>)
+          ) : (
+            <li>선호 장르가 없습니다.</li>
           )}
         </ul>
         </p>
