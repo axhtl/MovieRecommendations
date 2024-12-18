@@ -26,6 +26,10 @@ model = AutoModelForCausalLM.from_pretrained(
     load_in_8bit=True,
 )
 
+if tokenizer.pad_token is None:
+    tokenizer.add_special_tokens({'pad_token': '[PAD]'})
+    model.resize_token_embeddings(len(tokenizer))
+
 # Load Embeddings and FAISS Index
 def load_embeddings_and_index(embedding_file, index_file):
     # 저장된 임베딩과 영화 데이터 로드
@@ -38,8 +42,8 @@ def load_embeddings_and_index(embedding_file, index_file):
     return movies, embeddings, index
 
 # 불러오기
-embedding_file = "./data/embeddings.pkl"
-index_file = "./data/faiss_index.bin"
+embedding_file = "/home/t24326/svr/AI/recomsystem/data/embeddings.pkl"
+index_file = "/home/t24326/svr/AI/recomsystem/data/faiss_index.bin"
 movies, embeddings, index = load_embeddings_and_index(embedding_file, index_file)
 
 # Retrieval Using Precomputed Embeddings
@@ -50,7 +54,6 @@ def retrieve_context(query, model, index, movies, k=5):
     distances, indices = index.search(np.array(query_embedding), k)
     return [movies[i] for i in indices[0]]
 
-# Example prompt template
 def generate_prompt(instruction: str, context: str = None) -> str:
     if context:
         return f"""### Instruction:
@@ -59,12 +62,15 @@ def generate_prompt(instruction: str, context: str = None) -> str:
 ### Context:
 {context}
 
-### Response:"""
+### Response:
+"""
     else:
         return f"""### Instruction:
 {instruction}
 
-### Response:"""
+### Response:
+"""
+
     
 # Generate Response
 def generate_response(instruction, context):
@@ -79,8 +85,24 @@ def generate_response(instruction, context):
         repetition_penalty=1.2,
         do_sample=True
     )
-    response = tokenizer.decode(outputs[0], skip_special_tokens=True)
+    response = tokenizer.decode(outputs[0], skip_special_tokens=True).strip()
+
+    # 빈 응답 처리
+    if not response or "### Response:" in response and not response.split("### Response:")[1].strip():
+        fallback_prompt = generate_prompt("이전에 요청한 내용을 다시 한 번 작성해 주세요.", context)
+        fallback_inputs = tokenizer(fallback_prompt, return_tensors="pt").to(model.device)
+        outputs = model.generate(
+            **fallback_inputs,
+            max_length=512,
+            temperature=0.7,
+            top_p=0.9,
+            repetition_penalty=1.2,
+            do_sample=True
+        )
+        response = tokenizer.decode(outputs[0], skip_special_tokens=True).strip()
+
     return response
+
 
 
 def transform_query_to_instruction(query, format_type="similar_movie"):
@@ -122,11 +144,11 @@ def generate_movie_analysis_text(movie_details):
     )
     return text
 
-# 예제 호출
-movie_details = fetch_movie_details_from_tmdb("올드보이", TMDB_API_KEY)
+# # 예제 호출
+# movie_details = fetch_movie_details_from_tmdb("올드보이", TMDB_API_KEY)
 
-analysis_text = generate_movie_analysis_text(movie_details)
-# print(analysis_text)
+# analysis_text = generate_movie_analysis_text(movie_details)
+# # print(analysis_text)
 
 
 def retrieve_similar_movies_from_analysis(analysis_text, query_embedding_model, index, movies, k=5):
@@ -143,9 +165,9 @@ def retrieve_similar_movies_from_analysis(analysis_text, query_embedding_model, 
     ]
     return retrieved_results
 
-# 예제 호출
-query_embedding_model = SentenceTransformer("sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2")
-retrieved_movies = retrieve_similar_movies_from_analysis(analysis_text, query_embedding_model, index, movies)
+# # 예제 호출
+# query_embedding_model = SentenceTransformer("sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2")
+# retrieved_movies = retrieve_similar_movies_from_analysis(analysis_text, query_embedding_model, index, movies)
 
 
 
@@ -212,24 +234,24 @@ def generate_response_with_recommendation(instruction, analysis_text, retrieved_
     return final_response
 
 
-ott_platforms = {
-    "올드보이": "Netflix, Watcha",
-    "기생충": "Amazon Prime, Watcha",
-    "살인의 추억": "Netflix",
-}
+# ott_platforms = {
+#     "올드보이": "Netflix, Watcha",
+#     "기생충": "Amazon Prime, Watcha",
+#     "살인의 추억": "Netflix",
+# }
 
-# 영화 분석 텍스트
-analysis_text = generate_movie_analysis_text(movie_details)
+# # 영화 분석 텍스트
+# analysis_text = generate_movie_analysis_text(movie_details)
 
-# 영화 검색
-retrieved_movies = retrieve_similar_movies_from_analysis(
-    analysis_text, query_embedding_model, index, movies
-)
+# # 영화 검색
+# retrieved_movies = retrieve_similar_movies_from_analysis(
+#     analysis_text, query_embedding_model, index, movies
+# )
 
 
 def do_response(user_prompt=None):
 
-    target_moive = "트랜스포머"
+    target_moive = "트랜스포머, Transformer"
 
     movie_details = fetch_movie_details_from_tmdb(target_moive, TMDB_API_KEY)
     analysis_text = generate_movie_analysis_text(movie_details)
@@ -251,3 +273,92 @@ def do_response(user_prompt=None):
     )
 
     return response
+
+def chat(user_prompt=None):
+    """
+    사용자 프롬프트를 받아 모델 응답을 생성하는 함수.
+    :param user_prompt: 사용자 입력
+    :return: LLM의 Response 부분만 반환
+    """
+    if not user_prompt:
+        raise ValueError("사용자 프롬프트가 제공되지 않았습니다.")
+
+    # LLM 프롬프트와 컨텍스트 생성
+    instruction = "사용자의 요청에 응답해주세요."
+    context = user_prompt
+
+    # LLM 응답 생성
+    llm_full_response = generate_response(instruction, context)
+
+    # Response 부분만 추출
+    response_start = llm_full_response.find("### Response:") + len("### Response:")
+    final_response = llm_full_response[response_start:].strip()
+
+    # 빈 응답 처리
+    if not final_response:
+        # LLM 응답이 비어 있을 경우 기본 프롬프트로 재생성
+        fallback_instruction = "사용자의 요청을 다시 작성해주세요."
+        fallback_context = user_prompt
+        llm_full_response = generate_response(fallback_instruction, fallback_context)
+        response_start = llm_full_response.find("### Response:") + len("### Response:")
+        final_response = llm_full_response[response_start:].strip()
+
+    return final_response
+
+
+def explain_response(basemovie=None):
+    """
+    기준 영화(basemovie)에 대해 왜 추천했는지 설명을 생성하는 함수.
+    :param basemovie: 추천된 영화 (영화 제목)
+    :return: 추천 이유가 포함된 응답 문자열
+    """
+
+    if not basemovie:
+        raise ValueError("기준 영화(basemovie)가 제공되지 않았습니다.")
+
+    # 영화 세부 정보를 TMDB에서 가져오기
+    try:
+        movie_details = fetch_movie_details_from_tmdb(basemovie, TMDB_API_KEY)
+    except Exception as e:
+        return f"'{basemovie}'에 대한 정보를 가져오는 중 오류가 발생했습니다: {e}"
+
+    # 영화 분석 텍스트 생성
+    analysis_text = generate_movie_analysis_text(movie_details)
+
+    # 추천 이유 생성
+    recommendation_reason = (
+        f"'{basemovie}'는 다음과 같은 이유로 추천됩니다:\n"
+        f"- 장르: {', '.join([genre['name'] for genre in movie_details.get('genres', [])])}\n"
+        f"- 줄거리: {movie_details.get('overview', '줄거리 정보가 없습니다.')}")
+
+    # LLM 프롬프트 생성
+    instruction = f"다음 영화에 대해 왜 추천했는지 자세히 설명해주세요: {basemovie}"
+    context = (
+        f"[영화 제목: {basemovie}]\n\n"
+        f"{recommendation_reason}\n\n"
+        f"이 영화는 독특한 테마와 매력적인 이야기를 제공하여 추천드립니다."
+    )
+
+    # LLM을 활용한 응답 생성
+    llm_full_response = generate_response(instruction, context)
+
+    # Response 부분만 추출
+    response_start = llm_full_response.find("### Response:") + len("### Response:")
+    final_response = llm_full_response[response_start:].strip()
+
+    # 빈 응답 처리
+    if not final_response:
+        # LLM 응답이 비어 있을 경우 기본 프롬프트로 재생성
+        fallback_instruction = f"'{basemovie}'를 추천하는 이유를 다시 작성해 주세요."
+        fallback_context = (
+            f"[영화 제목: {basemovie}]\n\n"
+            f"{recommendation_reason}\n\n"
+            f"이 영화는 독특한 테마와 매력적인 이야기를 제공하여 추천드립니다."
+        )
+        llm_full_response = generate_response(fallback_instruction, fallback_context)
+        response_start = llm_full_response.find("### Response:") + len("### Response:")
+        final_response = llm_full_response[response_start:].strip()
+
+    return final_response
+
+
