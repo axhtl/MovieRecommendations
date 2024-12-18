@@ -1,0 +1,90 @@
+/* 전체 레이아웃 */
+.admin-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: #f0f0f0;
+    min-height: 100vh;
+    padding-top: 80px; /* 내브바와의 간격 */
+    box-sizing: border-box;
+  }
+  
+  .admin-content {
+    width: 90%;
+    max-width: 1200px;
+    background: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+    box-sizing: border-box;
+  }
+  
+  /* 헤더 스타일 */
+  h1 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #333;
+    font-size: 24px;
+  }
+  
+  /* 테이블 스타일 */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #fff;
+    border-radius: 5px;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  thead {
+    background-color: #343a40;
+    color: #fff;
+  }
+  
+  th, td {
+    padding: 12px;
+    text-align: center;
+    font-size: 14px;
+  }
+  
+  th {
+    text-transform: uppercase;
+  }
+  
+  tbody tr:nth-child(even) {
+    background-color: #f8f8f8;
+  }
+  
+  tbody tr:hover {
+    background-color: #e9ecef;
+  }
+  
+  .action-button {
+    padding: 6px 12px;
+    background-color: #333;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    font-size: 14px;
+    cursor: pointer;
+  }
+  
+  .action-button:hover {
+    background-color: #555;
+  }
+  
+  /* 반응형 디자인 */
+  @media (max-width: 768px) {
+    th, td {
+      font-size: 12px;
+      padding: 8px;
+    }
+  
+    .action-button {
+      font-size: 12px;
+      padding: 5px 8px;
+    }
+  }
+  

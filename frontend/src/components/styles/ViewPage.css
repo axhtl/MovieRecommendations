@@ -1,0 +1,56 @@
+/* 전체 페이지 스타일 */
+.view-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: #f0f0f0;
+    min-height: 120vh; /* 전체 화면 높이를 차지하도록 설정 */
+    padding-top: 20px;
+  }
+  
+  /* 페이지의 콘텐츠 부분 */
+  .view-content {
+    margin-top: 40px; /* 네비게이션 바와의 간격을 40px로 설정 */
+    text-align: center; /* 텍스트를 가운데 정렬할 때 */
+    width: 80%;
+    max-width: 1200px;
+    background: #fff;
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 40px; /* 추가적인 여백 */
+  }
+  
+  /* 제목 스타일링 */
+  .view-content h2 {
+    text-align: left;
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    color: #333;
+  }
+  
+  /* 영화 목록 스타일 */
+  .movie-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 20px;
+  }
+  
+  /* 페이지의 제목 및 설명 스타일 */
+  .view-header {
+    margin-bottom: 30px;
+    text-align: center;
+  }
+  
+  .view-header h1 {
+    font-size: 36px;
+    font-weight: bold;
+    color: #333;
+  }
+  
+  .view-header p {
+    font-size: 18px;
+    color: #666;
+  }
+  

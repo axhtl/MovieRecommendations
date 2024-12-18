@@ -1,0 +1,18 @@
+/* MovieList.css */
+
+.movie-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 20px;
+    padding: 20px;
+  }
+  
+
+.movie-list::-webkit-scrollbar {
+    height: 8px;
+}
+
+.movie-list::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 10px;
+}

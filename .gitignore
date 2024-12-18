@@ -5,6 +5,10 @@ build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 
+application.properties
+application-local.properties
+application-db.properties
+
 ### STS ###
 .apt_generated
 .classpath
@@ -34,4 +38,10 @@ out/
 /.nb-gradle/
 
 ### VS Code ###
-.vscode/
+.vscode/git add .
+
+# .env 파일 무시
+*.env
+
+# .properties 파일 무시
+*.properties
